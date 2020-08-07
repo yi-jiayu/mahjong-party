@@ -45,19 +45,9 @@ function NotFound() {
   return <h1>Not Found</h1>;
 }
 
-function Home({self}) {
+function JoinRoom() {
   let history = useHistory();
   let [roomId, setRoomId] = useState('');
-
-  const createRoom = async () => {
-    const resp = await fetch('http://localhost:8080/rooms', {method: 'post', credentials: "include"});
-    const {room_id: roomId} = await resp.json();
-    history.push(`/rooms/${roomId}`);
-  };
-
-  const handleChange = ({target: {value}}) => {
-    setRoomId(value);
-  };
 
   const joinRoom = async e => {
     e.preventDefault();
@@ -67,22 +57,33 @@ function Home({self}) {
     }
   };
 
+  return <div>
+    <form onSubmit={joinRoom}>
+      <label>Room ID:
+        <input type="text" value={roomId} onChange={e => setRoomId(e.target.value)}/>
+      </label>
+      <input type="submit" value="Join room"/>
+    </form>
+  </div>;
+}
+
+function Home({self}) {
+  let history = useHistory();
+
+  const createRoom = async () => {
+    const resp = await fetch('http://localhost:8080/rooms', {method: 'post', credentials: "include"});
+    const {room_id: roomId} = await resp.json();
+    history.push(`/rooms/${roomId}`);
+  };
+
   return <>
     <h1>Mahjong</h1>
     <p>{self.name ? `Welcome, ${self.name}!` : 'Welcome!'}</p>
     <div>
       <button onClick={createRoom}>Create room</button>
     </div>
-    <div>
-      <form onSubmit={joinRoom}>
-        <label>Room ID:
-          <input type="text" value={roomId} onChange={handleChange}/>
-        </label>
-        <input type="submit" value="Join room"/>
-      </form>
-    </div>
-  </>
-      ;
+    <JoinRoom/>
+  </>;
 }
 
 function Room() {
