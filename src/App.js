@@ -1,26 +1,124 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  useRouteMatch,
+  useParams,
+  useHistory
+} from "react-router-dom";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {self: {}}
+  }
+
+  async componentDidMount() {
+    const resp = await fetch('http://localhost:8080/self', {credentials: "include"});
+    const self = await resp.json();
+    this.setState({self});
+  }
+
+  render() {
+    return (
+        <Router>
+          <div>
+            <ul>
+              <li>
+                <Link to="/">Home</Link>
+              </li>
+              <li>
+                <Link to="/about">About</Link>
+              </li>
+              <li>
+                <Link to="/topics">Topics</Link>
+              </li>
+            </ul>
+
+            <Switch>
+              <Route path="/about">
+                <About/>
+              </Route>
+              <Route path="/rooms">
+                <Rooms/>
+              </Route>
+              <Route path="/">
+                <Home self={this.state.self}/>
+              </Route>
+              <Route path="*">
+                <NotFound/>
+              </Route>
+            </Switch>
+          </div>
+        </Router>
+    );
+  }
+}
+
+function NotFound() {
+  return <h1>Not Found</h1>;
+}
+
+function Home({self}) {
+  let history = useHistory();
+
+  const createRoom = async () => {
+    const resp = await fetch('http://localhost:8080/rooms', {method: 'post', credentials: "include"});
+    const {room_id: roomId} = await resp.json();
+    history.push(`/rooms/${roomId}`);
+  };
+
+  return <>
+    <h1>Mahjong</h1>
+    <p>{self.name ? `Welcome, ${self.name}!` : 'Welcome!'}</p>
+    <div>
+      <button onClick={createRoom}>Create room</button>
     </div>
-  );
+    <div>
+      <input/>
+      <button>Join room</button>
+    </div>
+  </>;
+}
+
+function Room() {
+  const {roomId} = useParams();
+  const [players, setPlayers] = useState([]);
+
+  useEffect(() => {
+    const eventSource = new EventSource(`http://localhost:8080/rooms/${roomId}/live`);
+    eventSource.onmessage = e => {
+      const {players} = JSON.parse(e.data);
+      setPlayers(players.map(p => <li key={p}>{p}</li>));
+      return () => eventSource.close();
+    };
+  }, [roomId])
+
+  return <>
+    <h1>{roomId}</h1>
+    <p>Current players:</p>
+    <ul>
+      {players}
+    </ul>
+  </>;
+}
+
+function About() {
+  return <h2>About</h2>;
+}
+
+function Rooms() {
+  let match = useRouteMatch();
+
+  return <>
+    <Switch>
+      <Route path={`${match.path}/:roomId`}>
+        <Room/>
+      </Route>
+    </Switch>
+  </>;
 }
 
 export default App;
