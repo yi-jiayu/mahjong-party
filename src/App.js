@@ -47,11 +47,24 @@ function NotFound() {
 
 function Home({self}) {
   let history = useHistory();
+  let [roomId, setRoomId] = useState('');
 
   const createRoom = async () => {
     const resp = await fetch('http://localhost:8080/rooms', {method: 'post', credentials: "include"});
     const {room_id: roomId} = await resp.json();
     history.push(`/rooms/${roomId}`);
+  };
+
+  const handleChange = ({target: {value}}) => {
+    setRoomId(value);
+  };
+
+  const joinRoom = async e => {
+    e.preventDefault();
+    const resp = await fetch(`http://localhost:8080/rooms/${roomId}/players`, {method: 'post', credentials: "include"});
+    if (resp.status === 200) {
+      history.push(`/rooms/${roomId}`);
+    }
   };
 
   return <>
@@ -61,10 +74,15 @@ function Home({self}) {
       <button onClick={createRoom}>Create room</button>
     </div>
     <div>
-      <input/>
-      <button>Join room</button>
+      <form onSubmit={joinRoom}>
+        <label>Room ID:
+          <input type="text" value={roomId} onChange={handleChange}/>
+        </label>
+        <input type="submit" value="Join room"/>
+      </form>
     </div>
-  </>;
+  </>
+      ;
 }
 
 function Room() {
