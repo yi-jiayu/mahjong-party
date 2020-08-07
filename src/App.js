@@ -94,7 +94,7 @@ function Room() {
     const eventSource = new EventSource(`http://localhost:8080/rooms/${roomId}/live`);
     eventSource.onmessage = e => {
       const {players} = JSON.parse(e.data);
-      setPlayers(players.map(p => <li key={p}>{p}</li>));
+      setPlayers(players);
     };
     return () => eventSource.close();
   }, [roomId])
@@ -103,7 +103,7 @@ function Room() {
     <h1>{roomId}</h1>
     <p>Current players:</p>
     <ul>
-      {players}
+      {players.map(p => <li key={p}>{p}</li>)}
     </ul>
   </>;
 }
