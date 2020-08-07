@@ -28,7 +28,7 @@ class App extends React.Component {
               <Route path="/rooms">
                 <Rooms/>
               </Route>
-              <Route path="/">
+              <Route exact path="/">
                 <Home self={this.state.self}/>
               </Route>
               <Route path="*">
