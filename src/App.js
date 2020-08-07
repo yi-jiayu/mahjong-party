@@ -95,8 +95,8 @@ function Room() {
     eventSource.onmessage = e => {
       const {players} = JSON.parse(e.data);
       setPlayers(players.map(p => <li key={p}>{p}</li>));
-      return () => eventSource.close();
     };
+    return () => eventSource.close();
   }, [roomId])
 
   return <>
