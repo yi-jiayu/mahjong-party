@@ -86,6 +86,21 @@ function Home({self}) {
   </>;
 }
 
+function Lobby({roomId, players}) {
+  const startGame = async () => {
+    await fetch(`http://localhost:8080/rooms/${roomId}/start`, {method: 'post', credentials: "include"});
+  }
+
+  return <>
+    <h1>{roomId}</h1>
+    <p>Current players:</p>
+    <ul>
+      {players.map(p => <li key={p}>{p}</li>)}
+    </ul>
+    {players.length === 4 && <button onClick={startGame}>Start game</button>}
+  </>;
+}
+
 function Room() {
   const {roomId} = useParams();
   const [players, setPlayers] = useState([]);
@@ -99,13 +114,7 @@ function Room() {
     return () => eventSource.close();
   }, [roomId])
 
-  return <>
-    <h1>{roomId}</h1>
-    <p>Current players:</p>
-    <ul>
-      {players.map(p => <li key={p}>{p}</li>)}
-    </ul>
-  </>;
+  return <Lobby roomId={roomId} players={players}/>;
 }
 
 function Rooms() {
