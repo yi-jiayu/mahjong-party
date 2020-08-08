@@ -3,12 +3,6 @@ import './board.css';
 import './tiles.css';
 
 class Board extends React.Component {
-  constructor(props) {
-    super(props);
-    const {players, round} = props;
-    this.state = {players, round};
-  }
-
   renderTiles(tiles) {
     if (tiles) {
       return tiles.map((tile, index) => <span className="tile" data-tile={tile} key={tile + index}></span>);
@@ -17,9 +11,22 @@ class Board extends React.Component {
   }
 
   render() {
-    const {round, players} = this.state;
+    const {round, players, self} = this.props;
     const {draws_left, current_turn, current_action, hands, discards} = round;
-    const [bottom, right, top, left] = hands;
+    const seat = self.seat || 0;
+    if (self.concealed) {
+      hands[seat].concealed = self.concealed;
+    }
+    const order = [0, 1, 2, 3].map(x => x + seat).map(x => x % 4);
+    console.log(order);
+    const directions = ['East', 'South', 'West', 'North'];
+    const seats = order.map(i => hands[i]);
+    console.log(seats);
+    for (let i = 0; i < 4; i++) {
+      seats[i].direction = directions[order[i]];
+      seats[i].name = players[order[i]];
+    }
+    const [bottom, right, top, left] = seats;
     return (
         <>
           <div className="table">
@@ -30,8 +37,8 @@ class Board extends React.Component {
             </div>
             <div className="labelBottom">
               <div>
-                <div>East</div>
-                <div>{players[0]}</div>
+                <div>{bottom.direction}</div>
+                <div>{bottom.name}</div>
               </div>
             </div>
             <div className="bottom">
@@ -47,8 +54,8 @@ class Board extends React.Component {
             </div>
             <div className="labelRight">
               <div>
-                <div>South</div>
-                <div>{players[1]}</div>
+                <div>{right.direction}</div>
+                <div>{right.name}</div>
               </div>
             </div>
             <div className="right">
@@ -64,8 +71,8 @@ class Board extends React.Component {
             </div>
             <div className="labelTop">
               <div>
-                <div>West</div>
-                <div>{players[2]}</div>
+                <div>{top.direction}</div>
+                <div>{top.name}</div>
               </div>
             </div>
             <div className="top">
@@ -81,8 +88,8 @@ class Board extends React.Component {
             </div>
             <div className="labelLeft">
               <div>
-                <div>North</div>
-                <div>{players[3]}</div>
+                <div>{left.direction}</div>
+                <div>{left.name}</div>
               </div>
             </div>
             <div className="left">

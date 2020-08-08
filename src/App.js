@@ -108,6 +108,7 @@ function Room() {
   const [players, setPlayers] = useState([]);
   const [phase, setPhase] = useState(0);
   const [round, setRound] = useState(null);
+  const [self, setSelf] = useState({});
 
   useEffect(() => {
     const eventSource = new EventSource(`http://localhost:8080/rooms/${roomId}/live`);
@@ -116,11 +117,16 @@ function Room() {
         setPhase(-1);
       }
     }
-    eventSource.onmessage = e => {
+    eventSource.onmessage = async e => {
       const {phase, players, round} = JSON.parse(e.data);
       setPlayers(players);
       setRound(round);
       setPhase(phase);
+      if (phase === 1) {
+        const resp = await fetch(`http://localhost:8080/rooms/${roomId}/self`, {credentials: "include"})
+        const self = await resp.json();
+        setSelf(self);
+      }
     };
     return () => eventSource.close();
   }, [roomId])
@@ -129,7 +135,7 @@ function Room() {
     case 0:
       return <Lobby roomId={roomId} players={players}/>;
     case 1:
-      return <Board players={players} round={round}/>
+      return <Board players={players} round={round} self={self}/>
     default:
       return <NotFound/>
   }
