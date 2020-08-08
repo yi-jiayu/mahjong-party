@@ -114,6 +114,18 @@
   background-image: url("tiles/backh.svg");
 }
 
+.selecting .tile {
+  opacity: 50%;
+}
+
+.selecting .tile.selected {
+  opacity: 100%;
+}
+
+.selecting .tile:hover {
+  opacity: 100%;
+}
+
 .tile:hover {
   opacity: 50%;
 }
