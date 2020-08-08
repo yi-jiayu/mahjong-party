@@ -1,12 +1,12 @@
-import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 import NotFound from "./NotFound";
 import Board from "./Board";
 
-function Lobby({roomId, players}) {
+function Lobby({roomId, room: {nonce, players}}) {
   const startGame = async () => {
-    await fetch(`http://localhost:8080/rooms/${roomId}/start`, {method: 'post', credentials: "include"});
+    await fetch(`http://localhost:8080/rooms/${roomId}/start?nonce=${nonce}`, {method: 'post', credentials: "include"});
   }
 
   return <>
@@ -21,7 +21,7 @@ function Lobby({roomId, players}) {
 
 function Room() {
   const {roomId} = useParams();
-  const [room, setRoom] = useState({players: [], round: null})
+  const [room, setRoom] = useState({nonce: 0, players: [], round: null})
   const [phase, setPhase] = useState(0);
   const [self, setSelf] = useState({});
 
@@ -33,9 +33,9 @@ function Room() {
       }
     }
     eventSource.onmessage = async e => {
-      const {phase, players, round} = JSON.parse(e.data);
+      const {nonce, phase, players, round} = JSON.parse(e.data);
       // room has to be set before phase
-      setRoom({players, round});
+      setRoom({nonce, players, round});
       setPhase(phase);
       if (phase === 1) {
         const resp = await fetch(`http://localhost:8080/rooms/${roomId}/self`, {credentials: "include"})
@@ -48,7 +48,7 @@ function Room() {
 
   switch (phase) {
     case 0:
-      return <Lobby roomId={roomId} players={room.players}/>;
+      return <Lobby roomId={roomId} room={room}/>;
     case 1:
       return <Board players={room.players} round={room.round} self={self}/>
     default:

@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   BrowserRouter as Router,
   Switch,
   Route,
   useRouteMatch,
-  useParams,
   useHistory
 } from "react-router-dom";
 
