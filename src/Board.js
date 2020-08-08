@@ -5,7 +5,7 @@ import './tiles.css';
 class Board extends React.Component {
   renderTiles(tiles) {
     if (tiles) {
-      return tiles.map((tile, index) => <span className="tile" data-tile={tile} key={tile + index}></span>);
+      return tiles.map((tile, index) => <span className="tile" data-tile={tile} key={tile + index}/>);
     }
     return [];
   }
@@ -18,10 +18,8 @@ class Board extends React.Component {
       hands[seat].concealed = self.concealed;
     }
     const order = [0, 1, 2, 3].map(x => x + seat).map(x => x % 4);
-    console.log(order);
     const directions = ['East', 'South', 'West', 'North'];
     const seats = order.map(i => hands[i]);
-    console.log(seats);
     for (let i = 0; i < 4; i++) {
       seats[i].direction = directions[order[i]];
       seats[i].name = players[order[i]];
