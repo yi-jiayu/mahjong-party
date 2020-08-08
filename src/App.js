@@ -8,6 +8,8 @@ import {
   useHistory
 } from "react-router-dom";
 
+import Board from './Board';
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -105,6 +107,7 @@ function Room() {
   const {roomId} = useParams();
   const [players, setPlayers] = useState([]);
   const [phase, setPhase] = useState(0);
+  const [round, setRound] = useState(null);
 
   useEffect(() => {
     const eventSource = new EventSource(`http://localhost:8080/rooms/${roomId}/live`);
@@ -114,8 +117,10 @@ function Room() {
       }
     }
     eventSource.onmessage = e => {
-      const {players} = JSON.parse(e.data);
+      const {phase, players, round} = JSON.parse(e.data);
       setPlayers(players);
+      setRound(round);
+      setPhase(phase);
     };
     return () => eventSource.close();
   }, [roomId])
@@ -123,6 +128,8 @@ function Room() {
   switch (phase) {
     case 0:
       return <Lobby roomId={roomId} players={players}/>;
+    case 1:
+      return <Board players={players} round={round}/>
     default:
       return <NotFound/>
   }

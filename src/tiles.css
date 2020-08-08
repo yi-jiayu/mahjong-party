@@ -1,0 +1,376 @@
+[data-tile="01猫"] {
+  background-image: url("tiles/01猫.svg");
+}
+
+.left [data-tile="01猫"], .right [data-tile="01猫"] {
+  background-image: url("tiles/01猫h.svg");
+}
+
+[data-tile="02老鼠"] {
+  background-image: url("tiles/02老鼠.svg");
+}
+
+.left [data-tile="02老鼠"], .right [data-tile="02老鼠"] {
+  background-image: url("tiles/02老鼠h.svg");
+}
+
+[data-tile="03公鸡"] {
+  background-image: url("tiles/03公鸡.svg");
+}
+
+.left [data-tile="03公鸡"], .right [data-tile="03公鸡"] {
+  background-image: url("tiles/03公鸡h.svg");
+}
+
+[data-tile="04蜈蚣"] {
+  background-image: url("tiles/04蜈蚣.svg");
+}
+
+.left [data-tile="04蜈蚣"], .right [data-tile="04蜈蚣"] {
+  background-image: url("tiles/04蜈蚣h.svg");
+}
+
+[data-tile="05梅"] {
+  background-image: url("tiles/05梅.svg");
+}
+
+.left [data-tile="05梅"], .right [data-tile="05梅"] {
+  background-image: url("tiles/05梅h.svg");
+}
+
+[data-tile="06兰"] {
+  background-image: url("tiles/06兰.svg");
+}
+
+.left [data-tile="06兰"], .right [data-tile="06兰"] {
+  background-image: url("tiles/06兰h.svg");
+}
+
+[data-tile="07菊"] {
+  background-image: url("tiles/07菊.svg");
+}
+
+.left [data-tile="07菊"], .right [data-tile="07菊"] {
+  background-image: url("tiles/07菊h.svg");
+}
+
+[data-tile="08竹"] {
+  background-image: url("tiles/08竹.svg");
+}
+
+.left [data-tile="08竹"], .right [data-tile="08竹"] {
+  background-image: url("tiles/08竹h.svg");
+}
+
+[data-tile="09春"] {
+  background-image: url("tiles/09春.svg");
+}
+
+.left [data-tile="09春"], .right [data-tile="09春"] {
+  background-image: url("tiles/09春h.svg");
+}
+
+[data-tile="10夏"] {
+  background-image: url("tiles/10夏.svg");
+}
+
+.left [data-tile="10夏"], .right [data-tile="10夏"] {
+  background-image: url("tiles/10夏h.svg");
+}
+
+[data-tile="11秋"] {
+  background-image: url("tiles/11秋.svg");
+}
+
+.left [data-tile="11秋"], .right [data-tile="11秋"] {
+  background-image: url("tiles/11秋h.svg");
+}
+
+[data-tile="12冬"] {
+  background-image: url("tiles/12冬.svg");
+}
+
+.left [data-tile="12冬"], .right [data-tile="12冬"] {
+  background-image: url("tiles/12冬h.svg");
+}
+
+[data-tile="13一筒"] {
+  background-image: url("tiles/13一筒.svg");
+}
+
+.left [data-tile="13一筒"], .right [data-tile="13一筒"] {
+  background-image: url("tiles/13一筒h.svg");
+}
+
+[data-tile="14二筒"] {
+  background-image: url("tiles/14二筒.svg");
+}
+
+.left [data-tile="14二筒"], .right [data-tile="14二筒"] {
+  background-image: url("tiles/14二筒h.svg");
+}
+
+[data-tile="15三筒"] {
+  background-image: url("tiles/15三筒.svg");
+}
+
+.left [data-tile="15三筒"], .right [data-tile="15三筒"] {
+  background-image: url("tiles/15三筒h.svg");
+}
+
+[data-tile="16四筒"] {
+  background-image: url("tiles/16四筒.svg");
+}
+
+.left [data-tile="16四筒"], .right [data-tile="16四筒"] {
+  background-image: url("tiles/16四筒h.svg");
+}
+
+[data-tile="17五筒"] {
+  background-image: url("tiles/17五筒.svg");
+}
+
+.left [data-tile="17五筒"], .right [data-tile="17五筒"] {
+  background-image: url("tiles/17五筒h.svg");
+}
+
+[data-tile="18六筒"] {
+  background-image: url("tiles/18六筒.svg");
+}
+
+.left [data-tile="18六筒"], .right [data-tile="18六筒"] {
+  background-image: url("tiles/18六筒h.svg");
+}
+
+[data-tile="19七筒"] {
+  background-image: url("tiles/19七筒.svg");
+}
+
+.left [data-tile="19七筒"], .right [data-tile="19七筒"] {
+  background-image: url("tiles/19七筒h.svg");
+}
+
+[data-tile="20八筒"] {
+  background-image: url("tiles/20八筒.svg");
+}
+
+.left [data-tile="20八筒"], .right [data-tile="20八筒"] {
+  background-image: url("tiles/20八筒h.svg");
+}
+
+[data-tile="21九筒"] {
+  background-image: url("tiles/21九筒.svg");
+}
+
+.left [data-tile="21九筒"], .right [data-tile="21九筒"] {
+  background-image: url("tiles/21九筒h.svg");
+}
+
+[data-tile="22一索"] {
+  background-image: url("tiles/22一索.svg");
+}
+
+.left [data-tile="22一索"], .right [data-tile="22一索"] {
+  background-image: url("tiles/22一索h.svg");
+}
+
+[data-tile="23二索"] {
+  background-image: url("tiles/23二索.svg");
+}
+
+.left [data-tile="23二索"], .right [data-tile="23二索"] {
+  background-image: url("tiles/23二索h.svg");
+}
+
+[data-tile="24三索"] {
+  background-image: url("tiles/24三索.svg");
+}
+
+.left [data-tile="24三索"], .right [data-tile="24三索"] {
+  background-image: url("tiles/24三索h.svg");
+}
+
+[data-tile="25四索"] {
+  background-image: url("tiles/25四索.svg");
+}
+
+.left [data-tile="25四索"], .right [data-tile="25四索"] {
+  background-image: url("tiles/25四索h.svg");
+}
+
+[data-tile="26五索"] {
+  background-image: url("tiles/26五索.svg");
+}
+
+.left [data-tile="26五索"], .right [data-tile="26五索"] {
+  background-image: url("tiles/26五索h.svg");
+}
+
+[data-tile="27六索"] {
+  background-image: url("tiles/27六索.svg");
+}
+
+.left [data-tile="27六索"], .right [data-tile="27六索"] {
+  background-image: url("tiles/27六索h.svg");
+}
+
+[data-tile="28七索"] {
+  background-image: url("tiles/28七索.svg");
+}
+
+.left [data-tile="28七索"], .right [data-tile="28七索"] {
+  background-image: url("tiles/28七索h.svg");
+}
+
+[data-tile="29八索"] {
+  background-image: url("tiles/29八索.svg");
+}
+
+.left [data-tile="29八索"], .right [data-tile="29八索"] {
+  background-image: url("tiles/29八索h.svg");
+}
+
+[data-tile="30九索"] {
+  background-image: url("tiles/30九索.svg");
+}
+
+.left [data-tile="30九索"], .right [data-tile="30九索"] {
+  background-image: url("tiles/30九索h.svg");
+}
+
+[data-tile="31一万"] {
+  background-image: url("tiles/31一万.svg");
+}
+
+.left [data-tile="31一万"], .right [data-tile="31一万"] {
+  background-image: url("tiles/31一万h.svg");
+}
+
+[data-tile="32二万"] {
+  background-image: url("tiles/32二万.svg");
+}
+
+.left [data-tile="32二万"], .right [data-tile="32二万"] {
+  background-image: url("tiles/32二万h.svg");
+}
+
+[data-tile="33三万"] {
+  background-image: url("tiles/33三万.svg");
+}
+
+.left [data-tile="33三万"], .right [data-tile="33三万"] {
+  background-image: url("tiles/33三万h.svg");
+}
+
+[data-tile="34四万"] {
+  background-image: url("tiles/34四万.svg");
+}
+
+.left [data-tile="34四万"], .right [data-tile="34四万"] {
+  background-image: url("tiles/34四万h.svg");
+}
+
+[data-tile="35五万"] {
+  background-image: url("tiles/35五万.svg");
+}
+
+.left [data-tile="35五万"], .right [data-tile="35五万"] {
+  background-image: url("tiles/35五万h.svg");
+}
+
+[data-tile="36六万"] {
+  background-image: url("tiles/36六万.svg");
+}
+
+.left [data-tile="36六万"], .right [data-tile="36六万"] {
+  background-image: url("tiles/36六万h.svg");
+}
+
+[data-tile="37七万"] {
+  background-image: url("tiles/37七万.svg");
+}
+
+.left [data-tile="37七万"], .right [data-tile="37七万"] {
+  background-image: url("tiles/37七万h.svg");
+}
+
+[data-tile="38八万"] {
+  background-image: url("tiles/38八万.svg");
+}
+
+.left [data-tile="38八万"], .right [data-tile="38八万"] {
+  background-image: url("tiles/38八万h.svg");
+}
+
+[data-tile="39九万"] {
+  background-image: url("tiles/39九万.svg");
+}
+
+.left [data-tile="39九万"], .right [data-tile="39九万"] {
+  background-image: url("tiles/39九万h.svg");
+}
+
+[data-tile="40东风"] {
+  background-image: url("tiles/40东风.svg");
+}
+
+.left [data-tile="40东风"], .right [data-tile="40东风"] {
+  background-image: url("tiles/40东风h.svg");
+}
+
+[data-tile="41南风"] {
+  background-image: url("tiles/41南风.svg");
+}
+
+.left [data-tile="41南风"], .right [data-tile="41南风"] {
+  background-image: url("tiles/41南风h.svg");
+}
+
+[data-tile="42西风"] {
+  background-image: url("tiles/42西风.svg");
+}
+
+.left [data-tile="42西风"], .right [data-tile="42西风"] {
+  background-image: url("tiles/42西风h.svg");
+}
+
+[data-tile="43北风"] {
+  background-image: url("tiles/43北风.svg");
+}
+
+.left [data-tile="43北风"], .right [data-tile="43北风"] {
+  background-image: url("tiles/43北风h.svg");
+}
+
+[data-tile="44红中"] {
+  background-image: url("tiles/44红中.svg");
+}
+
+.left [data-tile="44红中"], .right [data-tile="44红中"] {
+  background-image: url("tiles/44红中h.svg");
+}
+
+[data-tile="45青发"] {
+  background-image: url("tiles/45青发.svg");
+}
+
+.left [data-tile="45青发"], .right [data-tile="45青发"] {
+  background-image: url("tiles/45青发h.svg");
+}
+
+[data-tile="46白板"] {
+  background-image: url("tiles/46白板.svg");
+}
+
+.left [data-tile="46白板"], .right [data-tile="46白板"] {
+  background-image: url("tiles/46白板h.svg");
+}
+
+[data-tile="back"] {
+  background-image: url("tiles/back.svg");
+}
+
+.left [data-tile="back"], .right [data-tile="back"] {
+  background-image: url("tiles/backh.svg");
+}
+
