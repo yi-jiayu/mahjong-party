@@ -48,6 +48,7 @@ function Board({self, players, round, doAction}) {
 
   const canDiscard = current_turn === seat && current_action === mahjong.ACTION_DISCARD
   const canDraw = current_turn === seat && current_action === mahjong.ACTION_DRAW;
+  const canPeng = current_action === mahjong.ACTION_DRAW && mahjong.canPeng(self.concealed || [], discards[discards.length - 1]);
 
   let message = '';
   if (canDiscard) {
@@ -80,6 +81,7 @@ function Board({self, players, round, doAction}) {
     }
   };
   const drawTile = () => doAction('draw', []);
+  const pengTile = () => doAction('peng', [discards[discards.length - 1]]);
 
   return (
       <>
@@ -101,7 +103,7 @@ function Board({self, players, round, doAction}) {
             <div>
               <button onClick={drawTile} disabled={!canDraw}>Draw tile</button>
               <button disabled={!canDraw} onClick={selectTilesForChow}>Chow</button>
-              <button disabled>Peng</button>
+              <button disabled={!canPeng} onClick={pengTile}>Peng</button>
               <button disabled>Kong</button>
               <button disabled>Declare win</button>
             </div>
