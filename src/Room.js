@@ -21,9 +21,8 @@ function Lobby({roomId, players}) {
 
 function Room() {
   const {roomId} = useParams();
-  const [players, setPlayers] = useState([]);
+  const [room, setRoom] = useState({players: [], round: null})
   const [phase, setPhase] = useState(0);
-  const [round, setRound] = useState(null);
   const [self, setSelf] = useState({});
 
   useEffect(() => {
@@ -35,8 +34,8 @@ function Room() {
     }
     eventSource.onmessage = async e => {
       const {phase, players, round} = JSON.parse(e.data);
-      setPlayers(players);
-      setRound(round);
+      // room has to be set before phase
+      setRoom({players, round});
       setPhase(phase);
       if (phase === 1) {
         const resp = await fetch(`http://localhost:8080/rooms/${roomId}/self`, {credentials: "include"})
@@ -49,9 +48,9 @@ function Room() {
 
   switch (phase) {
     case 0:
-      return <Lobby roomId={roomId} players={players}/>;
+      return <Lobby roomId={roomId} players={room.players}/>;
     case 1:
-      return <Board players={players} round={round} self={self}/>
+      return <Board players={room.players} round={room.round} self={self}/>
     default:
       return <NotFound/>
   }
