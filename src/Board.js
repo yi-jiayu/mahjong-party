@@ -1,10 +1,9 @@
 import React from "react";
 import './board.css';
 import './tiles.css';
+import * as mahjong from './mahjong';
 
 const DIRECTIONS = ['East', 'South', 'West', 'North']
-const ACTION_DISCARD = 'discard';
-const ACTION_DRAW = 'draw';
 
 function Rack({tiles, onClick}) {
   return <div className="rack">
@@ -32,8 +31,11 @@ function Board({self, players, round, doAction}) {
   const order = [seat, (seat + 1) % 4, (seat + 2) % 4, (seat + 3) % 4];
   const [bottom, right, top, left] = order.map(x => ({direction: DIRECTIONS[x], name: players[x], ...hands[x]}));
 
+  const canDiscard = current_turn === seat && current_action === mahjong.ACTION_DISCARD
+  const canDraw = current_turn === seat && current_action === mahjong.ACTION_DRAW;
+
   const tileClick = tile => {
-    if (current_turn === seat && current_action === ACTION_DISCARD) {
+    if (canDiscard) {
       doAction('discard', [tile]);
     }
   };
@@ -56,7 +58,7 @@ function Board({self, players, round, doAction}) {
           </div>
           <div className="actions">
             <div>
-              <button onClick={drawTile} disabled={current_turn !== seat || current_action !== ACTION_DRAW}>Draw tile</button>
+              <button onClick={drawTile} disabled={!canDraw}>Draw tile</button>
               <button disabled>Chow</button>
               <button disabled>Peng</button>
               <button disabled>Kong</button>
