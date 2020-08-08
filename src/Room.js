@@ -4,27 +4,14 @@ import { useParams } from "react-router-dom";
 import NotFound from "./NotFound";
 import Board from "./Board";
 
-function Lobby({roomId, room: {nonce, players}}) {
-  const startGame = async () => {
-    const action = {
-      nonce,
-      type: "start",
-    }
-    await fetch(`http://localhost:8080/rooms/${roomId}/actions`, {
-      method: 'post',
-      credentials: "include",
-      headers: {'content-type': 'application/json'},
-      body: JSON.stringify(action),
-    });
-  }
-
+function Lobby({roomId, players, doAction}) {
   return <>
     <h1>{roomId}</h1>
     <p>Current players:</p>
     <ul>
       {players.map(p => <li key={p}>{p}</li>)}
     </ul>
-    {players.length === 4 && <button onClick={startGame}>Start game</button>}
+    {players.length === 4 && <button onClick={() => doAction('start', null)}>Start game</button>}
   </>;
 }
 
@@ -55,11 +42,25 @@ function Room() {
     return () => eventSource.close();
   }, [roomId])
 
+  const doAction = async (type, tiles) => {
+    const action = {
+      nonce: room.nonce,
+      type,
+      tiles
+    }
+    await fetch(`http://localhost:8080/rooms/${roomId}/actions`, {
+      method: 'post',
+      credentials: "include",
+      headers: {'content-type': 'application/json'},
+      body: JSON.stringify(action),
+    });
+  }
+
   switch (phase) {
     case 0:
-      return <Lobby roomId={roomId} room={room}/>;
+      return <Lobby roomId={roomId} players={room.players} doAction={doAction}/>;
     case 1:
-      return <Board players={room.players} round={room.round} self={self}/>
+      return <Board players={room.players} round={room.round} self={self} doAction={doAction}/>
     default:
       return <NotFound/>
   }
