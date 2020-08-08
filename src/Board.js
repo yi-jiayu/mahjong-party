@@ -34,6 +34,11 @@ function Board({self, players, round, doAction}) {
   const canDiscard = current_turn === seat && current_action === mahjong.ACTION_DISCARD
   const canDraw = current_turn === seat && current_action === mahjong.ACTION_DRAW;
 
+  let message = '';
+  if (canDiscard) {
+    message = 'Select a tile to discard';
+  }
+
   const tileClick = tile => {
     if (canDiscard) {
       doAction('discard', [tile]);
@@ -56,6 +61,7 @@ function Board({self, players, round, doAction}) {
             <Rack tiles={bottom.revealed}/>
             <Rack tiles={bottom.concealed} onClick={tileClick}/>
           </div>
+          <div className="message">{message}</div>
           <div className="actions">
             <div>
               <button onClick={drawTile} disabled={!canDraw}>Draw tile</button>
