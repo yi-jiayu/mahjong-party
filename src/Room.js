@@ -6,7 +6,16 @@ import Board from "./Board";
 
 function Lobby({roomId, room: {nonce, players}}) {
   const startGame = async () => {
-    await fetch(`http://localhost:8080/rooms/${roomId}/start?nonce=${nonce}`, {method: 'post', credentials: "include"});
+    const action = {
+      nonce,
+      type: "start",
+    }
+    await fetch(`http://localhost:8080/rooms/${roomId}/actions`, {
+      method: 'post',
+      credentials: "include",
+      headers: {'content-type': 'application/json'},
+      body: JSON.stringify(action),
+    });
   }
 
   return <>
