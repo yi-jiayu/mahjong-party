@@ -104,9 +104,15 @@ function Lobby({roomId, players}) {
 function Room() {
   const {roomId} = useParams();
   const [players, setPlayers] = useState([]);
+  const [phase, setPhase] = useState(0);
 
   useEffect(() => {
     const eventSource = new EventSource(`http://localhost:8080/rooms/${roomId}/live`);
+    eventSource.onerror = () => {
+      if (eventSource.readyState === EventSource.CLOSED) {
+        setPhase(-1);
+      }
+    }
     eventSource.onmessage = e => {
       const {players} = JSON.parse(e.data);
       setPlayers(players);
@@ -114,7 +120,12 @@ function Room() {
     return () => eventSource.close();
   }, [roomId])
 
-  return <Lobby roomId={roomId} players={players}/>;
+  switch (phase) {
+    case 0:
+      return <Lobby roomId={roomId} players={players}/>;
+    default:
+      return <NotFound/>
+  }
 }
 
 function Rooms() {
