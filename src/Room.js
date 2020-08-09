@@ -22,7 +22,7 @@ function Room() {
   const [self, setSelf] = useState({});
 
   useEffect(() => {
-    const eventSource = new EventSource(`http://localhost:8080/rooms/${roomId}/live`);
+    const eventSource = new EventSource(`/api/rooms/${roomId}/live`);
     eventSource.onerror = () => {
       if (eventSource.readyState === EventSource.CLOSED) {
         setPhase(-1);
@@ -34,7 +34,7 @@ function Room() {
       setRoom({nonce, players, round});
       setPhase(phase);
       if (phase === 1) {
-        const resp = await fetch(`http://localhost:8080/rooms/${roomId}/self`, {credentials: "include"})
+        const resp = await fetch(`/api/rooms/${roomId}/self`, {credentials: "include"})
         const self = await resp.json();
         setSelf(self);
       }
@@ -48,7 +48,7 @@ function Room() {
       type,
       tiles
     }
-    await fetch(`http://localhost:8080/rooms/${roomId}/actions`, {
+    await fetch(`/api/rooms/${roomId}/actions`, {
       method: 'post',
       credentials: "include",
       headers: {'content-type': 'application/json'},

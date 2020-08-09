@@ -17,7 +17,7 @@ class App extends React.Component {
   }
 
   async componentDidMount() {
-    const resp = await fetch('http://localhost:8080/self', {credentials: "include"});
+    const resp = await fetch('/api/self', {credentials: "include"});
     const self = await resp.json();
     this.setState({self});
   }
@@ -49,7 +49,7 @@ function JoinRoom() {
 
   const joinRoom = async e => {
     e.preventDefault();
-    const resp = await fetch(`http://localhost:8080/rooms/${roomId}/players`, {method: 'post', credentials: "include"});
+    const resp = await fetch(`/api/rooms/${roomId}/players`, {method: 'post', credentials: "include"});
     if (resp.status === 200) {
       history.push(`/rooms/${roomId}`);
     }
@@ -69,7 +69,7 @@ function Home({self}) {
   let history = useHistory();
 
   const createRoom = async () => {
-    const resp = await fetch('http://localhost:8080/rooms', {method: 'post', credentials: "include"});
+    const resp = await fetch('/api/rooms', {method: 'post', credentials: "include"});
     const {room_id: roomId} = await resp.json();
     history.push(`/rooms/${roomId}`);
   };
