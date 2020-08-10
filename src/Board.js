@@ -29,7 +29,8 @@ function Status({round}) {
 }
 
 function Board({self, players, round, doAction}) {
-  const {current_turn, current_action, hands, discards} = round;
+  const {current_turn: currentTurn, current_action: currentAction, hands, discards} = round;
+  const previousTurn = (currentTurn + 3) % 4;
   const seat = self.seat || 0;
   if (self.concealed) {
     hands[seat].concealed = self.concealed;
@@ -37,49 +38,56 @@ function Board({self, players, round, doAction}) {
   const order = [seat, (seat + 1) % 4, (seat + 2) % 4, (seat + 3) % 4];
   const [bottom, right, top, left] = order.map(x => ({direction: DIRECTIONS[x], name: players[x], ...hands[x]}));
 
-  const [selecting, setSelecting] = useState(false);
   const [selected, setSelected] = useState(-1);
   const [pendingAction, setPendingAction] = useState('');
 
   const selectTilesForChow = () => {
-    setSelecting(true);
     setPendingAction('chow');
   };
 
-  const canDiscard = current_turn === seat && current_action === mahjong.ACTION_DISCARD
-  const canDraw = current_turn === seat && current_action === mahjong.ACTION_DRAW;
-  const canPeng = current_action === mahjong.ACTION_DRAW && mahjong.canPeng(self.concealed || [], discards[discards.length - 1]);
+  const canDiscard = currentTurn === seat && currentAction === mahjong.ACTION_DISCARD;
+  const canDraw = currentTurn === seat && currentAction === mahjong.ACTION_DRAW;
+  const canPeng = currentAction === mahjong.ACTION_DRAW && mahjong.canPeng(self.concealed || [], discards[discards.length - 1]);
+  const canKongFromDiscard = seat !== previousTurn && currentAction === mahjong.ACTION_DRAW;
+  const canKongFromHand = seat === currentTurn && currentAction === mahjong.ACTION_DISCARD;
+  const canKong = canKongFromDiscard || canKongFromHand;
 
-  let message = '';
-  if (canDiscard) {
-    message = 'Select a tile to discard';
-  } else if (selecting && pendingAction === 'chow') {
-    message = 'Select two tiles to chow with'
-  }
-
-  const tileClick = (tile, index) => {
-    if (canDiscard) {
-      doAction('discard', [tile]);
-      return;
-    }
-    if (!selecting) {
-      return;
-    }
-    if (selected === index) {
-      setSelected(-1);
-      return;
-    }
-    if (selected === -1) {
-      setSelected(index);
-      return
-    }
-    if (pendingAction === 'chow') {
-      doAction('chow', [self.concealed[selected], self.concealed[index]]);
-      setSelecting(false);
-      setSelected(-1);
-      setPendingAction('');
+  const selectTilesForKong = () => {
+    if (canKongFromDiscard) {
+      doAction('kong', [discards[discards.length - 1]]);
+    } else if (canKongFromHand) {
+      setPendingAction('kong');
     }
   };
+
+  let message = '';
+  if (pendingAction === 'chow') {
+    message = 'Select two tiles to chow with'
+  } else if (pendingAction === 'kong') {
+    message = 'Select a tile to kong';
+  } else if (canDiscard) {
+    message = 'Select a tile to discard';
+  }
+
+  const selectTile = (tile, index) => {
+    if (pendingAction === 'chow') {
+      if (selected === index) {
+        setSelected(-1);
+      } else if (selected === -1) {
+        setSelected(index);
+      } else {
+        doAction('chow', [self.concealed[selected], self.concealed[index]]);
+        setSelected(-1);
+        setPendingAction('');
+      }
+    } else if (pendingAction === 'kong') {
+      doAction('kong', [tile]);
+      setPendingAction('');
+    } else if (canDiscard) {
+      doAction('discard', [tile]);
+    }
+  };
+
   const drawTile = () => doAction('draw', []);
   const pengTile = () => doAction('peng', [discards[discards.length - 1]]);
 
@@ -96,15 +104,16 @@ function Board({self, players, round, doAction}) {
           <div className="bottom">
             <Rack tiles={bottom.flowers}/>
             <Rack tiles={bottom.revealed}/>
-            <InteractiveRack tiles={bottom.concealed} onClick={tileClick} selecting={selecting} selected={selected}/>
+            <InteractiveRack tiles={bottom.concealed} onClick={selectTile} selecting={pendingAction === 'chow'}
+                             selected={selected}/>
           </div>
           <div className="message">{message}</div>
           <div className="actions">
             <div>
-              <button onClick={drawTile} disabled={!canDraw}>Draw tile</button>
+              <button disabled={!canDraw} onClick={drawTile}>Draw tile</button>
               <button disabled={!canDraw} onClick={selectTilesForChow}>Chow</button>
               <button disabled={!canPeng} onClick={pengTile}>Peng</button>
-              <button disabled>Kong</button>
+              <button disabled={!canKong} onClick={selectTilesForKong}>Kong</button>
               <button disabled>Declare win</button>
             </div>
           </div>
