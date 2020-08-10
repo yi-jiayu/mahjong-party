@@ -16,7 +16,7 @@ function InteractiveRack({tiles, onClick, selecting, selected}) {
 
 function Rack({tiles}) {
   return <div className="rack">
-    {tiles.map((tile, index) => <span className="tile" data-tile={tile} key={tile + index}/>)}
+    {tiles.flat().map((tile, index) => <span className="tile" data-tile={tile} key={tile + index}/>)}
   </div>;
 }
 
