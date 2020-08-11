@@ -75,7 +75,7 @@ function Board({self, players, round, doAction}) {
   const canKongFromDiscard = discards.length > 0 && seat !== previousTurn && currentAction === mahjong.ACTION_DRAW;
   const canKongFromHand = seat === currentTurn && currentAction === mahjong.ACTION_DISCARD;
   const canKong = canKongFromDiscard || canKongFromHand;
-  const canHuFromDiscard = canKongFromHand;
+  const canHuFromDiscard = canKongFromDiscard;
   const canHuFromHand = canKongFromHand;
   const canHu = canHuFromDiscard || canHuFromHand;
 
@@ -89,7 +89,11 @@ function Board({self, players, round, doAction}) {
 
   const declareWin = () => {
     setPendingAction('win');
-    setRemaining(self.concealed);
+    if (canHuFromDiscard) {
+      setRemaining([...self.concealed, discards[discards.length - 1]]);
+    } else {
+      setRemaining(self.concealed);
+    }
   }
 
   let message = '';
@@ -132,7 +136,7 @@ function Board({self, players, round, doAction}) {
         selected = new Set();
       }
       if (remaining.length === 2) {
-        doAction('hu', null, melds);
+        doAction('hu', null, [...melds, remaining]);
         setSelected(new Set());
         setMelds([]);
         setRemaining([]);
