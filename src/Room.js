@@ -42,13 +42,14 @@ function Room() {
     return () => eventSource.close();
   }, [roomId])
 
-  const doAction = async (type, tiles) => {
+  const doAction = async (type, tiles, melds) => {
     const action = {
       nonce: room.nonce,
       type,
-      tiles
+      tiles,
+      melds
     }
-    await fetch(`/api/rooms/${roomId}/actions`, {
+    return await fetch(`/api/rooms/${roomId}/actions`, {
       method: 'post',
       credentials: "include",
       headers: {'content-type': 'application/json'},
