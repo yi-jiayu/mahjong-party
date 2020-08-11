@@ -7,7 +7,7 @@ const DIRECTIONS = ['East', 'South', 'West', 'North']
 
 function InteractiveRack({tiles, onClick, selecting, selected}) {
   return <div className={selecting ? "rack selecting" : "rack"}>
-    {tiles.map((tile, index) => <span className={selected.includes(index) ? "tile selected" : "tile"}
+    {tiles.map((tile, index) => <span className={selected.has(index) ? "tile selected" : "tile"}
                                       data-tile={tile}
                                       key={tile + index}
                                       onClick={() => onClick(tile, index)}/>)}
@@ -59,11 +59,11 @@ function Board({self, players, round, doAction}) {
   const order = [seat, (seat + 1) % 4, (seat + 2) % 4, (seat + 3) % 4];
   const [bottom, right, top, left] = order.map(x => ({direction: DIRECTIONS[x], name: players[x], ...hands[x]}));
 
-  const [selected, setSelected] = useState([]);
-  const [pendingAction, setPendingAction] = useState('');
+  let [selected, setSelected] = useState(new Set());
+  let [pendingAction, setPendingAction] = useState('');
 
-  const [remaining, setRemaining] = useState([]);
-  const [melds, setMelds] = useState([]);
+  let [remaining, setRemaining] = useState([]);
+  let [melds, setMelds] = useState([]);
 
   const selectTilesForChow = () => {
     setPendingAction('chow');
@@ -94,7 +94,7 @@ function Board({self, players, round, doAction}) {
 
   let message = '';
   if (pendingAction === 'win') {
-    message = 'Group your remaining tiles into valid melds, leaving the eyes for last.'
+    message = 'Group your remaining tiles into valid melds, except for eyes'
   } else if (pendingAction === 'chow') {
     message = 'Select two tiles to chow with'
   } else if (pendingAction === 'kong') {
@@ -105,45 +105,43 @@ function Board({self, players, round, doAction}) {
 
   const selectTile = (tile, index) => {
     if (pendingAction === 'chow') {
-      if (selected.length === 1 && selected[0] === index) {
-        setSelected([]);
-      } else if (selected.length === 0) {
-        setSelected([index]);
+      if (selected.has(index)) {
+        selected.delete(index);
       } else {
-        doAction('chow', [self.concealed[selected[0]], self.concealed[index]]);
-        setSelected([]);
+        selected.add(index);
+      }
+      if (selected.size === 2) {
+        doAction('chow', [...selected].map(i => self.concealed[i]));
+        setSelected(new Set());
         setPendingAction('');
+      } else {
+        setSelected(new Set(selected));
       }
     } else if (pendingAction === 'kong') {
       doAction('kong', [tile]);
       setPendingAction('');
     } else if (pendingAction === 'win') {
-      if (selected.length === 2) {
-        if (index === selected[0]) {
-          setSelected([selected[1]]);
-        } else if (index === selected[1]) {
-          setSelected([selected[0]]);
-        } else {
-          setMelds(melds.concat([[bottom.concealed[selected[0]], bottom.concealed[selected[1]], bottom.concealed[index]]]))
-          setRemaining(remaining.filter((_, i) => i !== selected[0] && i !== selected[1] && i !== index));
-          setSelected([]);
-          if (remaining.length === 5) {
-            doAction('hu', null, melds);
-            setMelds([]);
-            setRemaining([]);
-            setPendingAction('');
-            return;
-          }
-        }
-      } else if (selected.length === 1) {
-        if (index === selected[0]) {
-          setSelected([]);
-        } else {
-          setSelected([selected[0], index]);
-        }
-      } else if (selected.length === 0) {
-        setSelected([index]);
+      if (selected.has(index)) {
+        selected.delete(index);
+      } else {
+        selected.add(index);
       }
+      if (selected.size === 3) {
+        melds.push([...selected].map(i => remaining[i]))
+        remaining = remaining.filter((_, i) => !selected.has(i));
+        selected = new Set();
+      }
+      if (remaining.length === 2) {
+        doAction('hu', null, melds);
+        setSelected(new Set());
+        setMelds([]);
+        setRemaining([]);
+        setPendingAction('');
+        return;
+      }
+      setMelds([...melds]);
+      setRemaining(remaining);
+      setSelected(new Set(selected));
     } else if (canDiscard) {
       doAction('discard', [tile]);
     }
@@ -151,7 +149,7 @@ function Board({self, players, round, doAction}) {
 
   const cancelPendingAction = () => {
     setRemaining([]);
-    setSelected([]);
+    setSelected(new Set());
     setPendingAction('');
     setMelds([]);
   }
