@@ -5,18 +5,26 @@ import * as mahjong from './mahjong';
 
 const DIRECTIONS = ['East', 'South', 'West', 'North']
 
-function InteractiveRack({tiles, onClick, selecting, selected}) {
+function InteractiveRack({tiles, onClick, selecting, selected, highlighted}) {
+  highlighted = new Set(highlighted);
   return <div className={selecting ? "rack selecting" : "rack"}>
-    {tiles.map((tile, index) => <span className={selected.has(index) ? "tile selected" : "tile"}
-                                      data-tile={tile}
-                                      key={tile + index}
-                                      onClick={() => onClick(tile, index)}/>)}
+    {tiles.sort().reduce((elems, tile, index) => {
+      const isSelected = selected.has(index) || highlighted.delete(tile);
+      return [...elems, <span className={isSelected ? "tile selected" : "tile"}
+                              data-tile={tile}
+                              key={tile + index}
+                              onClick={() => onClick(tile, index)}/>];
+    }, [])}
   </div>;
 }
 
-export function Rack({tiles}) {
-  return <div className="rack">
-    {tiles.flat().map((tile, index) => <span className="tile" data-tile={tile} key={tile + index}/>)}
+export function Rack({tiles, highlighting, highlighted = new Set()}) {
+  highlighted = new Set(highlighted);
+  return <div className={highlighting > 0 ? "rack selecting" : "rack"}>
+    {tiles.flat().reduce((elems, tile, index) => {
+      return [...elems,
+        <span className={highlighted.delete(tile) ? "tile selected" : "tile"} data-tile={tile} key={tile + index}/>];
+    }, [])}
   </div>;
 }
 
@@ -66,6 +74,10 @@ function Board({nonce, self, players, round, doAction}) {
 
   let [remaining, setRemaining] = useState([]);
   let [melds, setMelds] = useState([]);
+
+  let [highlighting, setHighlighting] = useState(false);
+  let [highlightedTiles, setHighlightedTiles] = useState(new Set());
+  let [highlightedFlowers, setHighlightedFlowers] = useState(new Set());
 
   // reset pending action if game moves on
   const previousRoundNonceRef = useRef(nonce);
@@ -117,18 +129,20 @@ function Board({nonce, self, players, round, doAction}) {
   }
 
   let message = '';
-  if (pendingAction === 'win') {
-    message = 'Group your remaining tiles into valid melds, except for eyes'
+  if (highlighting) {
+    message = 'Click anywhere to continue';
+  } else if (pendingAction === 'win') {
+    message = 'Group your remaining tiles into valid melds, except for eyes';
   } else if (pendingAction === 'chow') {
-    message = 'Select two tiles to chow with'
+    message = 'Select two tiles to chow with';
   } else if (pendingAction === 'kong') {
     message = 'Select a tile to kong';
   } else if (canDiscard) {
     message = 'Select a tile to discard';
   } else if (canDraw) {
-    message = 'Use the "Draw tile" button on the right to draw a new tile'
+    message = 'Use the "Draw tile" button on the right to draw a new tile';
   } else if (canEndGame) {
-    message = 'Try to win, or use the "End game in draw" button to end the game in a draw'
+    message = 'Try to win, or use the "End game in draw" button to end the game in a draw';
   }
 
   const selectTile = (tile, index) => {
@@ -182,12 +196,29 @@ function Board({nonce, self, players, round, doAction}) {
     setMelds([]);
   }
 
-  const drawTile = () => doAction('draw', []);
+  const drawTile = async () => {
+    const resp = await doAction('draw', []);
+    if (resp.status === 200) {
+      const {drawn, flowers} = await resp.json();
+      setHighlightedTiles(new Set([drawn]));
+      setHighlightedFlowers(new Set(flowers));
+      setHighlighting(true);
+    }
+  };
   const pengTile = () => doAction('peng', [discards[discards.length - 1]]);
+
+  const tableClick = e => {
+    if (highlighting) {
+      e.stopPropagation();
+      setHighlightedFlowers(new Set());
+      setHighlightedTiles(new Set());
+      setHighlighting(false);
+    }
+  };
 
   return (
       <>
-        <div className="table">
+        <div className="table" onClickCapture={tableClick}>
           <Status round={round}/>
           <div className="labelBottom">
             <div>
@@ -196,11 +227,11 @@ function Board({nonce, self, players, round, doAction}) {
             </div>
           </div>
           <div className="bottom">
-            <Rack tiles={bottom.flowers}/>
+            <Rack tiles={bottom.flowers} highlighting={highlighting} highlighted={highlightedFlowers}/>
             <Rack tiles={bottom.revealed.concat(melds)}/>
             <InteractiveRack tiles={pendingAction === 'win' ? remaining : bottom.concealed} onClick={selectTile}
-                             selecting={pendingAction === 'chow' || pendingAction === 'win'}
-                             selected={selected}/>
+                             selecting={pendingAction === 'chow' || pendingAction === 'win' || highlighting}
+                             selected={selected} highlighted={highlightedTiles}/>
           </div>
           <div className="message">{message}</div>
           <div className="actions">
