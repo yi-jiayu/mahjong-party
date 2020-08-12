@@ -115,19 +115,19 @@
 }
 
 .selecting .tile {
-  opacity: 50%;
+  opacity: 0.5;
 }
 
 .selecting .tile.selected {
-  opacity: 100%;
+  opacity: 1;
 }
 
 .selecting .tile:hover {
-  opacity: 100%;
+  opacity: 1;
 }
 
 .tile:hover {
-  opacity: 50%;
+  opacity: 0.5;
 }
 
 .rack {
