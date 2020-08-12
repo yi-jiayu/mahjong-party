@@ -83,9 +83,10 @@ function Board({nonce, self, players, round, doAction}) {
     setPendingAction('chow');
   };
 
-  const canDiscard = currentTurn === seat && currentAction === mahjong.ACTION_DISCARD;
-  const canDraw = currentTurn === seat && currentAction === mahjong.ACTION_DRAW;
-  const canPeng = currentAction === mahjong.ACTION_DRAW && mahjong.canPeng(self.concealed || [], discards[discards.length - 1]);
+  const canDiscard = round.draws_left > 0 && currentTurn === seat && currentAction === mahjong.ACTION_DISCARD;
+  const canDraw = round.draws_left > 0 && currentTurn === seat && currentAction === mahjong.ACTION_DRAW;
+  const canChow = discards.length > 0 && canDraw
+  const canPeng = currentAction === mahjong.ACTION_DRAW && seat !== previousTurn && mahjong.canPeng(self.concealed || [], discards[discards.length - 1]);
   const canKongFromDiscard = discards.length > 0 && seat !== previousTurn && currentAction === mahjong.ACTION_DRAW;
   const canKongFromHand = seat === currentTurn && currentAction === mahjong.ACTION_DISCARD;
   const canKong = canKongFromDiscard || canKongFromHand;
@@ -201,7 +202,7 @@ function Board({nonce, self, players, round, doAction}) {
           <div className="actions">
             <div>
               <Actions canDraw={canDraw} doDraw={drawTile}
-                       canChow={canDraw} doChow={selectTilesForChow}
+                       canChow={canChow} doChow={selectTilesForChow}
                        canPeng={canPeng} doPeng={pengTile}
                        canKong={canKong} doKong={selectTilesForKong}
                        canHu={canHu} doHu={declareWin}
