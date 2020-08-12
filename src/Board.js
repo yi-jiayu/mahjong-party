@@ -125,6 +125,10 @@ function Board({nonce, self, players, round, doAction}) {
     message = 'Select a tile to kong';
   } else if (canDiscard) {
     message = 'Select a tile to discard';
+  } else if (canDraw) {
+    message = 'Use the "Draw tile" button on the right to draw a new tile'
+  } else if (canEndGame) {
+    message = 'Try to win, or use the "End game in draw" button to end the game in a draw'
   }
 
   const selectTile = (tile, index) => {
