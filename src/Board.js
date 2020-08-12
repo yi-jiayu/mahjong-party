@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import './board.css';
 import './tiles.css';
 import * as mahjong from './mahjong';
@@ -49,7 +49,7 @@ function Actions({
   }
 }
 
-function Board({self, players, round, doAction}) {
+function Board({nonce, self, players, round, doAction}) {
   const {current_turn: currentTurn, current_action: currentAction, hands, discards} = round;
   const previousTurn = (currentTurn + 3) % 4;
   const seat = self.seat || 0;
@@ -64,6 +64,18 @@ function Board({self, players, round, doAction}) {
 
   let [remaining, setRemaining] = useState([]);
   let [melds, setMelds] = useState([]);
+
+  // reset pending action if game moves on
+  const previousRoundNonceRef = useRef(nonce);
+  useEffect(() => {
+    if (nonce !== previousRoundNonceRef.current) {
+      setRemaining([]);
+      setSelected(new Set());
+      setPendingAction('');
+      setMelds([]);
+    }
+    previousRoundNonceRef.current = nonce;
+  }, [nonce])
 
   const selectTilesForChow = () => {
     setPendingAction('chow');

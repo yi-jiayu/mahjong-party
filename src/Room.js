@@ -69,7 +69,7 @@ function Room() {
     case 0:
       return <Lobby roomId={roomId} players={room.players} doAction={doAction}/>;
     case 1:
-      return <Board players={room.players} round={room.round} self={self} doAction={doAction}/>
+      return <Board nonce={room.nonce} players={room.players} round={room.round} self={self} doAction={doAction}/>
     case 2:
       return <RoundOver players={room.players} round={room.round}/>
     default:
