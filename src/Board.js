@@ -145,7 +145,7 @@ function Board({nonce, self, players, round, doAction}) {
     message = 'Try to win, or use the "End game in draw" button to end the game in a draw';
   }
 
-  const selectTile = (tile, index) => {
+  const selectTile = async (tile, index) => {
     if (pendingAction === 'chow') {
       if (selected.has(index)) {
         selected.delete(index);
@@ -160,7 +160,13 @@ function Board({nonce, self, players, round, doAction}) {
         setSelected(new Set(selected));
       }
     } else if (pendingAction === 'kong') {
-      doAction('kong', [tile]);
+      const resp = await doAction('kong', [tile]);
+      if (resp.status === 200) {
+        const {drawn, flowers} = await resp.json();
+        setHighlightedTiles(new Set([drawn]));
+        setHighlightedFlowers(new Set(flowers));
+        setHighlighting(true);
+      }
       setPendingAction('');
     } else if (pendingAction === 'win') {
       if (selected.has(index)) {
