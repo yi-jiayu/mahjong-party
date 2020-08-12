@@ -15,6 +15,14 @@ function Lobby({roomId, players, doAction}) {
   </>;
 }
 
+function RoundOver({players, round}) {
+  const {current_turn: winner} = round;
+  return <>
+    <h2>Round over!</h2>
+    {players[winner]} won!
+  </>;
+}
+
 function Room() {
   const {roomId} = useParams();
   const [room, setRoom] = useState({nonce: 0, players: [], round: null})
@@ -62,6 +70,8 @@ function Room() {
       return <Lobby roomId={roomId} players={room.players} doAction={doAction}/>;
     case 1:
       return <Board players={room.players} round={room.round} self={self} doAction={doAction}/>
+    case 2:
+      return <RoundOver players={room.players} round={room.round}/>
     default:
       return <NotFound/>
   }

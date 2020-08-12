@@ -131,7 +131,7 @@ function Board({self, players, round, doAction}) {
         selected.add(index);
       }
       if (selected.size === 3) {
-        melds.push([...selected].map(i => remaining[i]))
+        melds.push([...selected].map(i => remaining[i]));
         remaining = remaining.filter((_, i) => !selected.has(i));
         selected = new Set();
       }
