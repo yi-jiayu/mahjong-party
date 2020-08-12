@@ -19,7 +19,7 @@ function RoundOver({players, round}) {
   const {current_turn: winner} = round;
   return <>
     <h2>Round over!</h2>
-    {players[winner]} won!
+    {winner === -1 ? "It was a draw!" : `${players[winner]} won!`}
   </>;
 }
 
@@ -69,11 +69,11 @@ function Room() {
     case 0:
       return <Lobby roomId={roomId} players={room.players} doAction={doAction}/>;
     case 1:
-      return <Board nonce={room.nonce} players={room.players} round={room.round} self={self} doAction={doAction}/>
+      return <Board nonce={room.nonce} players={room.players} round={room.round} self={self} doAction={doAction}/>;
     case 2:
-      return <RoundOver players={room.players} round={room.round}/>
+      return <RoundOver players={room.players} round={room.round}/>;
     default:
-      return <NotFound/>
+      return <NotFound/>;
   }
 }
 

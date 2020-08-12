@@ -34,6 +34,7 @@ function Actions({
                    canPeng, doPeng,
                    canKong, doKong,
                    canHu, doHu,
+                   canEndGame, doEndGame,
                    pendingAction, cancelPendingAction
                  }) {
   if (pendingAction === '') {
@@ -43,6 +44,7 @@ function Actions({
       <button disabled={!canPeng} onClick={doPeng}>Peng</button>
       <button disabled={!canKong} onClick={doKong}>Kong</button>
       <button disabled={!canHu} onClick={doHu}>Declare win</button>
+      {canEndGame && <button onClick={doEndGame}>End game in draw</button>}
     </>;
   } else {
     return <button onClick={cancelPendingAction}>Cancel</button>;
@@ -90,6 +92,11 @@ function Board({nonce, self, players, round, doAction}) {
   const canHuFromDiscard = canKongFromDiscard;
   const canHuFromHand = canKongFromHand;
   const canHu = canHuFromDiscard || canHuFromHand;
+  const canEndGame = currentTurn === seat && currentAction === mahjong.ACTION_DISCARD && round.draws_left === 0;
+
+  const endGame = () => {
+    doAction('end');
+  }
 
   const selectTilesForKong = () => {
     if (canKongFromDiscard) {
@@ -198,6 +205,7 @@ function Board({nonce, self, players, round, doAction}) {
                        canPeng={canPeng} doPeng={pengTile}
                        canKong={canKong} doKong={selectTilesForKong}
                        canHu={canHu} doHu={declareWin}
+                       canEndGame={canEndGame} doEndGame={endGame}
                        pendingAction={pendingAction} cancelPendingAction={cancelPendingAction}/>
             </div>
           </div>
