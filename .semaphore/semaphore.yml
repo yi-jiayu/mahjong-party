@@ -5,15 +5,18 @@ agent:
     type: e1-standard-2
     os_image: ubuntu1804
 blocks:
-  - name: Build
+  - name: Build and deploy
     task:
       jobs:
-        - name: Build
+        - name: Build and deploy
           commands:
             - checkout
             - npm install
             - npm run build
+            - 'rsync -a --group www-data --delete build/ mahjong:/srv'
       prologue:
         commands:
           - nvm install lts/erbium
           - sem-version node lts/erbium
+      secrets:
+        - name: github@mahjong SSH key
