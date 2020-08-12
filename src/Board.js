@@ -14,13 +14,13 @@ function InteractiveRack({tiles, onClick, selecting, selected}) {
   </div>;
 }
 
-function Rack({tiles}) {
+export function Rack({tiles}) {
   return <div className="rack">
     {tiles.flat().map((tile, index) => <span className="tile" data-tile={tile} key={tile + index}/>)}
   </div>;
 }
 
-function Status({round}) {
+export function Status({round}) {
   const {draws_left, current_turn, current_action} = round;
   return <div className="status">
     <div>Draws left: {draws_left}</div>

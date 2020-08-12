@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 
 import NotFound from "./NotFound";
 import Board from "./Board";
+import ReadOnlyBoard from "./ReadOnlyBoard";
 
 function Lobby({roomId, players, doAction}) {
   return <>
@@ -69,7 +70,11 @@ function Room() {
     case 0:
       return <Lobby roomId={roomId} players={room.players} doAction={doAction}/>;
     case 1:
-      return <Board nonce={room.nonce} players={room.players} round={room.round} self={self} doAction={doAction}/>;
+      if (self.seat != null) {
+        return <Board nonce={room.nonce} players={room.players} round={room.round} self={self} doAction={doAction}/>;
+      } else {
+        return <ReadOnlyBoard players={room.players} round={room.round}/>
+      }
     case 2:
       return <RoundOver players={room.players} round={room.round}/>;
     default:
