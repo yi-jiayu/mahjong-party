@@ -15,5 +15,5 @@ blocks:
             - npm run build
       prologue:
         commands:
-          - nvm install --lts erbium
-          - sem-version node --lts carbon
+          - nvm install lts/erbium
+          - sem-version node lts/erbium
