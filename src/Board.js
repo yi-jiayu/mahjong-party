@@ -45,7 +45,7 @@ function Actions({
                    canEndGame, doEndGame,
                    pendingAction, cancelPendingAction
                  }) {
-  if (pendingAction === '') {
+  if (pendingAction === '' || pendingAction === 'continue') {
     return <>
       <button disabled={!canDraw} onClick={doDraw}>Draw tile</button>
       <button disabled={!canChow} onClick={doChow}>Chow</button>
@@ -75,7 +75,6 @@ function Board({nonce, self, players, round, doAction}) {
   let [remaining, setRemaining] = useState([]);
   let [melds, setMelds] = useState([]);
 
-  let [highlighting, setHighlighting] = useState(false);
   let [highlightedTiles, setHighlightedTiles] = useState(new Set());
   let [highlightedFlowers, setHighlightedFlowers] = useState(new Set());
 
@@ -129,7 +128,7 @@ function Board({nonce, self, players, round, doAction}) {
   }
 
   let message = '';
-  if (highlighting) {
+  if (pendingAction === 'continue') {
     message = 'Click anywhere to continue';
   } else if (pendingAction === 'win') {
     message = 'Group your remaining tiles into valid melds, except for eyes';
@@ -165,7 +164,7 @@ function Board({nonce, self, players, round, doAction}) {
         const {drawn, flowers} = await resp.json();
         setHighlightedTiles(new Set([drawn]));
         setHighlightedFlowers(new Set(flowers));
-        setHighlighting(true);
+        setPendingAction('continue');
       }
       setPendingAction('');
     } else if (pendingAction === 'win') {
@@ -208,17 +207,17 @@ function Board({nonce, self, players, round, doAction}) {
       const {drawn, flowers} = await resp.json();
       setHighlightedTiles(new Set([drawn]));
       setHighlightedFlowers(new Set(flowers));
-      setHighlighting(true);
+      setPendingAction('continue');
     }
   };
   const pengTile = () => doAction('peng', [discards[discards.length - 1]]);
 
   const tableClick = e => {
-    if (highlighting) {
+    if (pendingAction === 'continue') {
       e.stopPropagation();
       setHighlightedFlowers(new Set());
       setHighlightedTiles(new Set());
-      setHighlighting(false);
+      setPendingAction('');
     }
   };
 
@@ -233,10 +232,10 @@ function Board({nonce, self, players, round, doAction}) {
             </div>
           </div>
           <div className="bottom">
-            <Rack tiles={bottom.flowers} highlighting={highlighting} highlighted={highlightedFlowers}/>
+            <Rack tiles={bottom.flowers} highlighting={pendingAction === 'continue'} highlighted={highlightedFlowers}/>
             <Rack tiles={bottom.revealed.concat(melds)}/>
             <InteractiveRack tiles={pendingAction === 'win' ? remaining : bottom.concealed} onClick={selectTile}
-                             selecting={pendingAction === 'chow' || pendingAction === 'win' || highlighting}
+                             selecting={pendingAction === 'chow' || pendingAction === 'win' || pendingAction === 'continue'}
                              selected={selected} highlighted={highlightedTiles}/>
           </div>
           <div className="message">{message}</div>
