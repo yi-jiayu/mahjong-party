@@ -8,7 +8,7 @@ const DIRECTIONS = ['East', 'South', 'West', 'North']
 function InteractiveRack({tiles, onClick, selecting, selected, highlighted}) {
   highlighted = new Set(highlighted);
   return <div className={selecting ? "rack selecting" : "rack"}>
-    {tiles.sort().reduce((elems, tile, index) => {
+    {[...tiles].sort().reduce((elems, tile, index) => {
       const isSelected = selected.has(index) || highlighted.delete(tile);
       return [...elems, <span className={isSelected ? "tile selected" : "tile"}
                               data-tile={tile}
@@ -47,12 +47,12 @@ function Actions({
                  }) {
   if (pendingAction === '' || pendingAction === 'continue') {
     return <>
-      <button disabled={!canDraw} onClick={doDraw}>Draw tile</button>
-      <button disabled={!canChow} onClick={doChow}>Chow</button>
-      <button disabled={!canPeng} onClick={doPeng}>Peng</button>
-      <button disabled={!canKong} onClick={doKong}>Kong</button>
-      <button disabled={!canHu} onClick={doHu}>Declare win</button>
-      {canEndGame && <button onClick={doEndGame}>End game in draw</button>}
+      <button disabled={!canDraw} onClick={doDraw} id="buttonDraw">Draw tile</button>
+      <button disabled={!canChow} onClick={doChow} id="buttonChow">Chow</button>
+      <button disabled={!canPeng} onClick={doPeng} id="buttonPeng">Peng</button>
+      <button disabled={!canKong} onClick={doKong} id="buttonKong">Kong</button>
+      <button disabled={!canHu} onClick={doHu} id="buttonHu">Declare win</button>
+      {canEndGame && <button onClick={doEndGame} id="buttonEnd">End game in draw</button>}
     </>;
   } else {
     return <button onClick={cancelPendingAction}>Cancel</button>;
@@ -63,11 +63,11 @@ function Board({nonce, self, players, round, doAction}) {
   const {current_turn: currentTurn, current_action: currentAction, hands, discards} = round;
   const previousTurn = (currentTurn + 3) % 4;
   const seat = self.seat || 0;
-  if (self.concealed) {
-    hands[seat].concealed = self.concealed;
-  }
   const order = [seat, (seat + 1) % 4, (seat + 2) % 4, (seat + 3) % 4];
   const [bottom, right, top, left] = order.map(x => ({direction: DIRECTIONS[x], name: players[x], ...hands[x]}));
+  if (self.concealed) {
+    bottom.concealed = self.concealed;
+  }
 
   let [selected, setSelected] = useState(new Set());
   let [pendingAction, setPendingAction] = useState('');
@@ -78,14 +78,20 @@ function Board({nonce, self, players, round, doAction}) {
   let [highlightedTiles, setHighlightedTiles] = useState(new Set());
   let [highlightedFlowers, setHighlightedFlowers] = useState(new Set());
 
+  const cancelPendingAction = () => {
+    setRemaining([]);
+    setSelected(new Set());
+    setPendingAction('');
+    setMelds([]);
+    setHighlightedFlowers(new Set());
+    setHighlightedTiles(new Set());
+  }
+
   // reset pending action if game moves on
   const previousRoundNonceRef = useRef(nonce);
   useEffect(() => {
     if (nonce !== previousRoundNonceRef.current) {
-      setRemaining([]);
-      setSelected(new Set());
-      setPendingAction('');
-      setMelds([]);
+      cancelPendingAction();
     }
     previousRoundNonceRef.current = nonce;
   }, [nonce])
@@ -121,9 +127,9 @@ function Board({nonce, self, players, round, doAction}) {
   const declareWin = () => {
     setPendingAction('win');
     if (canHuFromDiscard) {
-      setRemaining([...self.concealed, discards[discards.length - 1]]);
+      setRemaining([...self.concealed, discards[discards.length - 1]].sort());
     } else {
-      setRemaining(self.concealed);
+      setRemaining([...self.concealed].sort());
     }
   }
 
@@ -194,13 +200,6 @@ function Board({nonce, self, players, round, doAction}) {
     }
   };
 
-  const cancelPendingAction = () => {
-    setRemaining([]);
-    setSelected(new Set());
-    setPendingAction('');
-    setMelds([]);
-  }
-
   const drawTile = async () => {
     const resp = await doAction('draw', []);
     if (resp.status === 200) {
@@ -233,7 +232,7 @@ function Board({nonce, self, players, round, doAction}) {
           </div>
           <div className="bottom">
             <Rack tiles={bottom.flowers} highlighting={pendingAction === 'continue'} highlighted={highlightedFlowers}/>
-            <Rack tiles={bottom.revealed.concat(melds)}/>
+            <Rack tiles={bottom.revealed.concat(melds)} highlighting={pendingAction === 'continue'}/>
             <InteractiveRack tiles={pendingAction === 'win' ? remaining : bottom.concealed} onClick={selectTile}
                              selecting={pendingAction === 'chow' || pendingAction === 'win' || pendingAction === 'continue'}
                              selected={selected} highlighted={highlightedTiles}/>

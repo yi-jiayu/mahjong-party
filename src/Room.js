@@ -16,7 +16,7 @@ function Lobby({roomId, players, doAction}) {
   </>;
 }
 
-function RoundOver({players, round}) {
+export function RoundOver({players, round}) {
   const {current_turn: winner} = round;
   return <>
     <h2>Round over!</h2>

@@ -9,6 +9,7 @@ import {
 
 import Room from './Room';
 import NotFound from "./NotFound";
+import Tutorial from "./Tutorial";
 
 class App extends React.Component {
   constructor(props) {
@@ -32,6 +33,9 @@ class App extends React.Component {
               </Route>
               <Route path="/rooms">
                 <Rooms/>
+              </Route>
+              <Route path="/tutorial">
+                <Tutorial/>
               </Route>
               <Route path="*">
                 <NotFound/>
@@ -79,6 +83,9 @@ function Home({self}) {
     <p>{self.name ? `Welcome, ${self.name}!` : 'Welcome!'}</p>
     <div>
       <button onClick={createRoom}>Create room</button>
+    </div>
+    <div>
+      <a href="/tutorial">Tutorial</a>
     </div>
     <JoinRoom/>
   </>;
