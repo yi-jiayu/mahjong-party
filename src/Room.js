@@ -26,9 +26,8 @@ export function RoundOver({players, round}) {
 
 function Room() {
   const {roomId} = useParams();
-  const [room, setRoom] = useState({nonce: 0, players: [], round: null})
+  const [room, setRoom] = useState({seat: -1, nonce: 0, players: [], round: null})
   const [phase, setPhase] = useState(0);
-  const [self, setSelf] = useState({});
 
   useEffect(() => {
     const eventSource = new EventSource(`/api/rooms/${roomId}/live`);
@@ -38,15 +37,10 @@ function Room() {
       }
     }
     eventSource.onmessage = async e => {
-      const {nonce, phase, players, round} = JSON.parse(e.data);
+      const {seat, nonce, phase, players, round} = JSON.parse(e.data);
       // room has to be set before phase
-      setRoom({nonce, players, round});
+      setRoom({seat, nonce, players, round});
       setPhase(phase);
-      if (phase === 1) {
-        const resp = await fetch(`/api/rooms/${roomId}/self`, {credentials: "include"})
-        const self = await resp.json();
-        setSelf(self);
-      }
     };
     return () => eventSource.close();
   }, [roomId])
@@ -70,8 +64,9 @@ function Room() {
     case 0:
       return <Lobby roomId={roomId} players={room.players} doAction={doAction}/>;
     case 1:
-      if (self.seat != null) {
-        return <Board nonce={room.nonce} players={room.players} round={room.round} self={self} doAction={doAction}/>;
+      if (room.seat !== -1) {
+        return <Board nonce={room.nonce} players={room.players} round={room.round} seat={room.seat}
+                      doAction={doAction}/>;
       } else {
         return <ReadOnlyBoard players={room.players} round={room.round}/>
       }

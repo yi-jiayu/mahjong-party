@@ -14,7 +14,7 @@ const initialRound = {
     {
       flowers: ["05梅"],
       revealed: ["32二万", "33三万", "34四万"],
-      concealed: ["", "", "", "", "", "", "", "", "", "", "", "", ""]
+      concealed: ["15三筒", "17五筒", "19七筒", "20八筒", "23二索", "23二索", "36六万", "36六万", "38八万"]
     },
     {
       flowers: ["09春"],
@@ -35,15 +35,10 @@ const initialRound = {
   current_turn: 0,
   current_action: 'draw'
 };
-const initialSelf = {
-  concealed: ["15三筒", "17五筒", "19七筒", "20八筒", "23二索", "23二索", "36六万", "36六万", "38八万"],
-  seat: 0,
-};
 
 export default function Tutorial() {
   let history = useHistory();
   const [round, setRound] = useState(initialRound);
-  const [self, setSelf] = useState(initialSelf);
   const [currentStep, setCurrentStep] = useState(0);
   const [hideNextButton, setHideNextButton] = useState(false);
   const [nonce, setNonce] = useState(0);
@@ -193,14 +188,12 @@ export default function Tutorial() {
     }
   ];
 
-  const doAction = (action, tiles, melds) => {
+  const doAction = action => {
     if (currentStep === 3 && action === 'draw') {
       setRound(produce(round, draft => {
         draft.draws_left--;
+        draft.hands[0].concealed.push('43北风');
         draft.current_action = 'discard';
-      }));
-      setSelf(produce(self, draft => {
-        draft.concealed.push('43北风');
       }));
       setCurrentStep(currentStep + 1);
       return Promise.resolve({
@@ -215,9 +208,7 @@ export default function Tutorial() {
         draft.current_turn = 1;
         draft.current_action = 'draw';
         draft.discards.push('43北风');
-      }));
-      setSelf(produce(self, draft => {
-        draft.concealed.splice(draft.concealed.indexOf('43北风'), 1);
+        draft.hands[0].concealed.splice(draft.hands[0].concealed.indexOf('43北风'), 1);
       }));
       setCurrentStep(currentStep + 1);
     } else if (currentStep === 8 && action === 'peng') {
@@ -226,9 +217,7 @@ export default function Tutorial() {
         draft.current_action = 'discard';
         draft.discards.pop();
         draft.hands[0].revealed.push(["23二索", "23二索", "23二索"]);
-      }));
-      setSelf(produce(self, draft => {
-        draft.concealed = draft.concealed.filter(tile => tile !== "23二索");
+        draft.hands[0].concealed = draft.hands[0].concealed.filter(tile => tile !== "23二索");
       }));
       setCurrentStep(currentStep + 1);
     } else if (currentStep === 13 && action === 'chow') {
@@ -236,10 +225,8 @@ export default function Tutorial() {
         draft.current_action = 'discard';
         draft.hands[0].revealed.push(["15三筒", "16四筒", "17五筒"]);
         draft.discards.pop();
-      }));
-      setSelf(produce(self, draft => {
-        draft.concealed.splice(draft.concealed.indexOf("15三筒"), 1);
-        draft.concealed.splice(draft.concealed.indexOf("17五筒"), 1);
+        draft.hands[0].concealed.splice(draft.hands[0].concealed.indexOf("15三筒"), 1);
+        draft.hands[0].concealed.splice(draft.hands[0].concealed.indexOf("17五筒"), 1);
       }));
       setCurrentStep(currentStep + 1);
     } else if (currentStep === 14 && action === 'discard') {
@@ -247,9 +234,7 @@ export default function Tutorial() {
         draft.current_turn = 1;
         draft.current_action = 'draw';
         draft.discards.push("38八万");
-      }));
-      setSelf(produce(self, draft => {
-        draft.concealed.splice(draft.concealed.indexOf("38八万"), 1);
+        draft.hands[0].concealed.splice(draft.hands[0].concealed.indexOf("38八万"), 1);
       }));
       setCurrentStep(currentStep + 1);
     } else if (currentStep === 18 && action === 'hu') {
@@ -278,7 +263,7 @@ export default function Tutorial() {
     {round.current_action === 'game over' ?
         <RoundOver players={players} round={round}/>
         :
-        <Board nonce={nonce} players={players} round={round} self={self} doAction={doAction}/>
+        <Board nonce={nonce} players={players} round={round} seat={0} doAction={doAction}/>
     }
     <Tour
         disableKeyboardNavigation={hideNextButton ? true : ['esc', 'left']}
