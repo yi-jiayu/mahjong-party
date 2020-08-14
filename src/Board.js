@@ -63,8 +63,15 @@ function Board({nonce, seat, players, round, doAction}) {
   const {current_turn: currentTurn, current_action: currentAction, hands, discards} = round;
   const previousTurn = (currentTurn + 3) % 4;
   const order = [seat, (seat + 1) % 4, (seat + 2) % 4, (seat + 3) % 4];
-  const [self, right, top, left] = order.map(x => ({direction: DIRECTIONS[x], name: players[x], ...hands[x]}));
-  self.concealed.sort();
+  const [bottom, right, top, left] = order.map(x => ({
+    direction: DIRECTIONS[x],
+    name: players[x],
+    ...hands[x]
+  }));
+  const self = {
+    ...bottom,
+    concealed: [...bottom.concealed].sort(),
+  }
 
   let [selected, setSelected] = useState(new Set());
   let [pendingAction, setPendingAction] = useState('');
