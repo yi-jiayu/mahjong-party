@@ -6,12 +6,17 @@ import Board from "./Board";
 import ReadOnlyBoard from "./ReadOnlyBoard";
 
 function Lobby({roomId, players, doAction}) {
+  const addBot = async () => {
+    await fetch(`/api/rooms/${roomId}/bots`, {method: 'post', credentials: "include"})
+  }
+
   return <>
     <h1>{roomId}</h1>
     <p>Current players:</p>
     <ul>
       {players.map(p => <li key={p}>{p}</li>)}
     </ul>
+    {players.length < 4 && <button onClick={addBot}>Add bot</button>}
     {players.length === 4 && <button onClick={() => doAction('start', null)}>Start game</button>}
   </>;
 }
