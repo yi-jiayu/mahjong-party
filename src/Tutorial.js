@@ -266,7 +266,7 @@ export default function Tutorial() {
         <Board nonce={nonce} players={players} round={round} seat={0} doAction={doAction}/>
     }
     <Tour
-        disableKeyboardNavigation={hideNextButton ? true : ['esc', 'left']}
+        disableKeyboardNavigation={hideNextButton ? true : ['left']}
         closeWithMask={false}
         disableDotsNavigation={true}
         isOpen={true}
