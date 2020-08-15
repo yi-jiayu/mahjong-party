@@ -26,6 +26,7 @@ export function RoundOver({players, round}) {
   return <>
     <h2>Round over!</h2>
     {winner === -1 ? "It was a draw!" : `${players[winner]} won!`}
+    {winner !== -1 && <Rack tiles={round.hands[winner].concealed}/>}
   </>;
 }
 
