@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import NotFound from "./NotFound";
-import Board from "./Board";
+import Board, { Rack } from "./Board";
 import ReadOnlyBoard from "./ReadOnlyBoard";
 
 function Lobby({roomId, players, doAction}) {
