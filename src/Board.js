@@ -114,7 +114,7 @@ function Board({nonce, seat, players, round, doAction}) {
   const canHuFromDiscard = canKongFromDiscard;
   const canHuFromHand = canKongFromHand;
   const canHu = canHuFromDiscard || canHuFromHand;
-  const canEndGame = currentTurn === seat && currentAction === mahjong.ACTION_DISCARD && round.draws_left === 0;
+  const canEndGame = currentTurn === seat && currentAction === mahjong.ACTION_DISCARD && round.draws_left <= 0;
 
   const endGame = () => {
     doAction('end');
