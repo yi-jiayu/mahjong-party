@@ -6,6 +6,7 @@ import {
   useRouteMatch
 } from "react-router-dom";
 
+import './App.css'
 import Home from "./Home";
 import Room from './Room';
 import NotFound from "./NotFound";
