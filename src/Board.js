@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import './board.css';
 import './tiles.css';
 import * as mahjong from './mahjong';
@@ -37,6 +37,7 @@ export function Status({round}) {
 }
 
 function Actions({
+                   timeUntilDraw,
                    canDraw, doDraw,
                    canChow, doChow,
                    canPeng, doPeng,
@@ -47,8 +48,9 @@ function Actions({
                  }) {
   if (pendingAction === '' || pendingAction === 'continue') {
     return <>
-      <button disabled={!canDraw} onClick={doDraw} id="buttonDraw">Draw tile</button>
-      <button disabled={!canChow} onClick={doChow} id="buttonChow">Chow</button>
+      <button disabled={!canDraw} onClick={doDraw}
+              id="buttonDraw">{timeUntilDraw > 0 ? timeUntilDraw : "Draw tile"}</button>
+      <button disabled={!canChow} onClick={doChow} id="buttonChow">{timeUntilDraw > 0 ? timeUntilDraw : "Chi"}</button>
       <button disabled={!canPeng} onClick={doPeng} id="buttonPeng">Peng</button>
       <button disabled={!canKong} onClick={doKong} id="buttonKong">Kong</button>
       <button disabled={!canHu} onClick={doHu} id="buttonHu">Declare win</button>
@@ -60,7 +62,14 @@ function Actions({
 }
 
 function Board({nonce, seat, players, round, doAction}) {
-  const {current_turn: currentTurn, current_action: currentAction, hands, discards} = round;
+  const {
+    current_turn: currentTurn,
+    current_action: currentAction,
+    hands,
+    discards,
+    pong_duration: pongDuration,
+    last_discard_time: lastDiscardTime,
+  } = round;
   const previousTurn = (currentTurn + 3) % 4;
   const order = [seat, (seat + 1) % 4, (seat + 2) % 4, (seat + 3) % 4];
   const [bottom, right, top, left] = order.map(x => ({
@@ -100,13 +109,26 @@ function Board({nonce, seat, players, round, doAction}) {
     previousRoundNonceRef.current = nonce;
   }, [nonce])
 
+  let [timeUntilDraw, setTimeUntilDraw] = useState(0);
+  useEffect(() => {
+    if (currentTurn === seat && currentAction === mahjong.ACTION_DRAW) {
+      if (lastDiscardTime + pongDuration - Date.now() > 0) {
+        const timer = setTimeout(() => {
+          setTimeUntilDraw(Math.round((lastDiscardTime + pongDuration - Date.now()) / 100) / 10);
+        }, 100);
+        return () => clearTimeout(timer);
+      }
+    }
+  });
+
   const selectTilesForChow = () => {
     setPendingAction('chow');
   };
 
+  const waitingForPong = Date.now() < (lastDiscardTime + pongDuration);
   const canDiscard = round.draws_left > 0 && currentTurn === seat && currentAction === mahjong.ACTION_DISCARD;
-  const canDraw = round.draws_left > 0 && currentTurn === seat && currentAction === mahjong.ACTION_DRAW;
-  const canChow = discards.length > 0 && canDraw
+  const canDraw = !waitingForPong && round.draws_left > 0 && currentTurn === seat && currentAction === mahjong.ACTION_DRAW;
+  const canChow = discards.length > 0 && canDraw;
   const canPeng = currentAction === mahjong.ACTION_DRAW && seat !== previousTurn && mahjong.canPeng(self.concealed || [], discards[discards.length - 1]);
   const canKongFromDiscard = discards.length > 0 && seat !== previousTurn && currentAction === mahjong.ACTION_DRAW;
   const canKongFromHand = seat === currentTurn && currentAction === mahjong.ACTION_DISCARD;
@@ -244,7 +266,8 @@ function Board({nonce, seat, players, round, doAction}) {
           <div className="message">{message}</div>
           <div className="actions">
             <div>
-              <Actions canDraw={canDraw} doDraw={drawTile}
+              <Actions timeUntilDraw={timeUntilDraw}
+                       canDraw={canDraw} doDraw={drawTile}
                        canChow={canChow} doChow={selectTilesForChow}
                        canPeng={canPeng} doPeng={pengTile}
                        canKong={canKong} doKong={selectTilesForKong}
