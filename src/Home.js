@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, useHistory } from "react-router-dom";
+import React, {useState} from "react";
+import {Link, useHistory} from "react-router-dom";
 
 import './home.css';
 
@@ -53,5 +53,9 @@ export default function Home({self}) {
     <p>Check out the tutorial to get started, or create a room and invite your friends to join you. Not enough players?
       Fill in the empty slots with bots!</p>
     <p>Mahjong Party is a work in progress.</p>
+    <p>All mahjong tile images are sourced from <a
+      href="https://commons.wikimedia.org/wiki/Category:SVG_Oblique_illustrations_of_Mahjong_tiles"
+      title="via Wikimedia Commons">Cangjie6</a> / <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA</a>
+    </p>
   </main>;
 }
