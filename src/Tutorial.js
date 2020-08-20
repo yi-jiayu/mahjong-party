@@ -35,6 +35,9 @@ const initialRound = {
   current_turn: 0,
   current_action: 'draw'
 };
+const results = [{
+  dealer: 0, prevailing_wind: 0, winner: 0, points: 2
+}];
 
 export default function Tutorial() {
   let history = useHistory();
@@ -261,10 +264,9 @@ export default function Tutorial() {
 
   return <div onClick={bubbleCatcher}>
     {round.current_action === 'game over' ?
-        <RoundOver players={players} round={round}/>
+        <RoundOver players={players} round={round} results={results}/>
         :
-        <Board nonce={nonce} players={players} round={round} seat={0} doAction={doAction}/>
-    }
+        <Board nonce={nonce} players={players} round={round} seat={0} doAction={doAction}/>}
     <Tour
         disableKeyboardNavigation={hideNextButton ? true : ['left']}
         closeWithMask={false}
