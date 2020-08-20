@@ -22,3 +22,4 @@ blocks:
           - sem-version node lts/erbium
       secrets:
         - name: github@mahjong SSH key
+        - name: Mahjong Party GA Tracking ID

@@ -26,24 +26,30 @@ class App extends React.Component {
 
   render() {
     return (
-        <Router>
-          <div>
-            <Switch>
-              <Route exact path="/">
-                <Home self={this.state.self}/>
-              </Route>
-              <Route path="/rooms">
-                <Rooms/>
-              </Route>
-              <Route path="/tutorial">
-                <Tutorial/>
-              </Route>
-              <Route path="*">
-                <NotFound/>
-              </Route>
-            </Switch>
-          </div>
-        </Router>
+      <Router>
+        <Route path="/" render={({location}) => {
+          if (typeof window.ga === 'function') {
+            window.ga('set', 'page', location.pathname + location.search);
+            window.ga('send', 'pageview');
+          }
+        }}/>
+        <div>
+          <Switch>
+            <Route exact path="/">
+              <Home self={this.state.self}/>
+            </Route>
+            <Route path="/rooms">
+              <Rooms/>
+            </Route>
+            <Route path="/tutorial">
+              <Tutorial/>
+            </Route>
+            <Route path="*">
+              <NotFound/>
+            </Route>
+          </Switch>
+        </div>
+      </Router>
     );
   }
 }
