@@ -1,4 +1,4 @@
-main {
+.main {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -10,14 +10,6 @@ main {
   font-size: 64px;
 }
 
-input {
-  margin: 1px;
-}
-
-p {
-  max-width: 600px;
-}
-
-span[role="img"] {
+.party span[role="img"] {
   display: inline-block;
 }
