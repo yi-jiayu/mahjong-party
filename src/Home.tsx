@@ -22,7 +22,7 @@ function HostGame() {
   return (
     <>
       <h2>Host a new game</h2>
-      <form onSubmit={hostGame}>
+      <form onSubmit={hostGame} autoComplete="off">
         <label htmlFor="input_HostGame_name">Your name</label>
         <input
           type="text"
@@ -63,7 +63,7 @@ function JoinGame() {
   return (
     <>
       <h2>Join an existing game</h2>
-      <form onSubmit={joinGame}>
+      <form onSubmit={joinGame} autoComplete="off">
         <label htmlFor="input_JoinGame_name">Your name</label>
         <input
           type="text"
