@@ -84,6 +84,7 @@ function Room() {
   const [phase, setPhase] = useState(0);
 
   useEffect(() => {
+    document.title = `${roomId} | Mahjong Party`;
     const eventSource = new EventSource(`/api/rooms/${roomId}/live`);
     eventSource.onerror = () => {
       if (eventSource.readyState === EventSource.CLOSED) {

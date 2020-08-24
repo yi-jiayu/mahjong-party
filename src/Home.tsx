@@ -1,5 +1,6 @@
 import React, { SyntheticEvent, useState } from "react";
 import { Link, Route, Switch, useHistory } from "react-router-dom";
+import Helmet from "react-helmet";
 
 import styles from "./Home.module.css";
 
@@ -21,6 +22,9 @@ function HostGame() {
 
   return (
     <>
+      <Helmet>
+        <title>Host game | Mahjong Party</title>
+      </Helmet>
       <h2>Host a new game</h2>
       <form onSubmit={hostGame} autoComplete="off">
         <label htmlFor="input_HostGame_name">Your name</label>
@@ -62,6 +66,9 @@ function JoinGame() {
 
   return (
     <>
+      <Helmet>
+        <title>Join game | Mahjong Party</title>
+      </Helmet>
       <h2>Join an existing game</h2>
       <form onSubmit={joinGame} autoComplete="off">
         <label htmlFor="input_JoinGame_name">Your name</label>
@@ -90,6 +97,9 @@ function JoinGame() {
 function About() {
   return (
     <>
+      <Helmet>
+        <title>About | Mahjong Party</title>
+      </Helmet>
       <h2>About Mahjong Party</h2>
       <p>Mahjong Party is a work in progress.</p>
       <p>
@@ -118,6 +128,9 @@ export default function Home() {
     <main className={styles.main}>
       <Switch>
         <Route exact path="/">
+          <Helmet>
+            <title>Mahjong Party</title>
+          </Helmet>
           <div className={styles.party}>
             <span role="img" aria-label="Mahjong Party">
               🀄🎉

@@ -4,6 +4,7 @@ import Tour from "reactour";
 import produce from "immer";
 import { RoundOver } from "./Room";
 import { useHistory } from "react-router-dom";
+import Helmet from "react-helmet";
 
 const initialRound = {
   draws_left: 46,
@@ -315,34 +316,39 @@ export default function Tutorial() {
   };
 
   return (
-    <div onClick={bubbleCatcher}>
-      {round.current_action === "game over" ? (
-        <RoundOver players={players} round={round} results={results} />
-      ) : (
-        <Board
-          nonce={nonce}
-          players={players}
-          round={round}
-          seat={0}
-          doAction={doAction}
+    <>
+      <Helmet>
+        <title>Tutorial | Mahjong Party</title>
+      </Helmet>
+      <div onClick={bubbleCatcher}>
+        {round.current_action === "game over" ? (
+          <RoundOver players={players} round={round} results={results} />
+        ) : (
+          <Board
+            nonce={nonce}
+            players={players}
+            round={round}
+            seat={0}
+            doAction={doAction}
+          />
+        )}
+        <Tour
+          disableKeyboardNavigation={hideNextButton ? true : ["left"]}
+          closeWithMask={false}
+          disableDotsNavigation={true}
+          isOpen={true}
+          prevButton={<></>}
+          steps={steps}
+          nextButton={hideNextButton && <></>}
+          nextStep={hideNextButton ? () => false : undefined}
+          goToStep={currentStep}
+          getCurrentStep={onStepChange}
+          lastStepNextButton={
+            <button onClick={() => history.push("/")}>Finish tutorial</button>
+          }
+          onRequestClose={() => history.replace("/")}
         />
-      )}
-      <Tour
-        disableKeyboardNavigation={hideNextButton ? true : ["left"]}
-        closeWithMask={false}
-        disableDotsNavigation={true}
-        isOpen={true}
-        prevButton={<></>}
-        steps={steps}
-        nextButton={hideNextButton && <></>}
-        nextStep={hideNextButton ? () => false : undefined}
-        goToStep={currentStep}
-        getCurrentStep={onStepChange}
-        lastStepNextButton={
-          <button onClick={() => history.push("/")}>Finish tutorial</button>
-        }
-        onRequestClose={() => history.replace("/")}
-      />
-    </div>
+      </div>
+    </>
   );
 }
