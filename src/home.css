@@ -18,6 +18,6 @@ p {
   max-width: 600px;
 }
 
-span[role=img] {
+span[role="img"] {
   display: inline-block;
 }

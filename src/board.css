@@ -9,7 +9,10 @@
   grid-row: 1 / span 2;
 }
 
-.labelBottom, .labelRight, .labelTop, .labelLeft {
+.labelBottom,
+.labelRight,
+.labelTop,
+.labelLeft {
   text-align: center;
 }
 
@@ -108,7 +111,8 @@
   background-image: url("tiles/back.svg");
 }
 
-.left .tile, .right .tile {
+.left .tile,
+.right .tile {
   height: 39px;
   width: 48px;
   background-image: url("tiles/backh.svg");
@@ -134,11 +138,13 @@
   display: flex;
 }
 
-.top .rack, .bottom .rack {
-  height: 48px
+.top .rack,
+.bottom .rack {
+  height: 48px;
 }
 
-.left .rack, .right .rack {
+.left .rack,
+.right .rack {
   width: 48px;
 }
 
