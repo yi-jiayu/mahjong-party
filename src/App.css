@@ -1,4 +1,4 @@
-@import 'sakura.css';
+@import "vendor/sakura.css";
 
 .results th {
   text-align: center;
