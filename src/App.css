@@ -1,5 +1,11 @@
 @import "vendor/sakura.css";
 
+.table {
+  width: 100vw !important;
+  position: absolute;
+  left: 0;
+}
+
 .results th {
   text-align: center;
 }
