@@ -48,13 +48,9 @@ function Rooms() {
   let match = useRouteMatch();
 
   return (
-    <>
-      <Switch>
-        <Route path={`${match.path}/:roomId`}>
-          <Room />
-        </Route>
-      </Switch>
-    </>
+    <Route path={`${match.path}/:roomId`}>
+      <Room />
+    </Route>
   );
 }
 

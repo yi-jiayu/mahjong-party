@@ -53,7 +53,7 @@ function JoinGame() {
 
   const joinGame = async (e: SyntheticEvent) => {
     e.preventDefault();
-    const resp = await fetch(`/api/rooms/${room}`, {
+    const resp = await fetch(`/api/rooms/${room}/players`, {
       method: "post",
       credentials: "include",
       body: `name=${encodeURIComponent(name)}`,
