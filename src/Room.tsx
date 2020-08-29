@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { SyntheticEvent, useEffect, useState } from "react";
 import styles from "./App.module.css";
 import { useHistory, useParams } from "react-router-dom";
 import produce from "immer";
@@ -15,30 +15,51 @@ interface Player {
 }
 
 interface Room {
+  inside: boolean;
   nonce: number;
   phase: number;
   players: Player[];
   round?: Round;
 }
 
-function EmptySeat() {
+function JoinRoom({ roomId }: { roomId: string }) {
+  const [name, setName] = useState("");
+
+  const joinRoom = async (e: SyntheticEvent) => {
+    e.preventDefault();
+    await fetch(`/api/rooms/${roomId}/players`, {
+      method: "post",
+      credentials: "include",
+      body: `name=${encodeURIComponent(name)}`,
+      headers: { "content-type": "application/x-www-form-urlencoded" },
+    });
+  };
+
   return (
-    <li>
-      <button disabled={true}>Empty</button>
-    </li>
+    <form onSubmit={joinRoom}>
+      <input
+        type="text"
+        name="name"
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Name"
+        style={{ marginRight: "8px" }}
+      />
+      <input type="submit" value="Join room" />
+    </form>
   );
 }
 
 function Lobby({
   roomId,
-  players,
+  room,
   startGame,
 }: {
   roomId: string;
-  players: Player[];
+  room: Room;
   startGame: () => void;
 }) {
   const history = useHistory();
+  const { players, inside } = room;
 
   const leaveRoom = async () => {
     const resp = await fetch(`/api/rooms/${roomId}/players`, {
@@ -59,19 +80,26 @@ function Lobby({
           {players.map(({ name }) => (
             <li key={name}>{name}</li>
           ))}
-          {players.length < 2 && <EmptySeat />}
-          {players.length < 3 && <EmptySeat />}
-          {players.length < 4 && <EmptySeat />}
+          {players.length < 2 && <li>(empty)</li>}
+          {players.length < 3 && <li>(empty)</li>}
+          {players.length < 4 && <li>(empty)</li>}
         </ul>
       </div>
-      <div className={styles.buttonRow}>
-        <button type="button" onClick={leaveRoom}>
-          Leave room
-        </button>
-        <button type="button" disabled={players.length < 4} onClick={startGame}>
-          Start game
-        </button>
-      </div>
+      {inside ? (
+        <div className={styles.buttonRow}>
+          <button type="button" onClick={leaveRoom}>
+            Leave room
+          </button>
+          <button
+            type="button"
+            disabled={players.length < 4}
+            onClick={startGame}>
+            Start game
+          </button>
+        </div>
+      ) : (
+        <JoinRoom roomId={roomId} />
+      )}
     </main>
   );
 }
@@ -79,6 +107,7 @@ function Lobby({
 export default function Room() {
   const { roomId }: { roomId: string } = useParams();
   const [room, setRoom] = useState<Room>({
+    inside: false,
     nonce: 0,
     phase: PHASE_LOBBY,
     players: [],
@@ -113,9 +142,7 @@ export default function Room() {
 
   switch (room.phase) {
     case PHASE_LOBBY:
-      return (
-        <Lobby roomId={roomId} players={room.players} startGame={startGame} />
-      );
+      return <Lobby roomId={roomId} room={room} startGame={startGame} />;
     case PHASE_IN_PROGRESS:
       if (room.round) {
         return <Board players={room.players} round={room.round} />;

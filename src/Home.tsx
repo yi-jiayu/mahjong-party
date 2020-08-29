@@ -26,7 +26,7 @@ function HostGame() {
         <title>Host game | Mahjong Party</title>
       </Helmet>
       <h2>Host a new game</h2>
-      <form onSubmit={hostGame} autoComplete="off">
+      <form onSubmit={hostGame}>
         <label htmlFor="input_HostGame_name">Your name</label>
         <input
           type="text"
@@ -70,7 +70,7 @@ function JoinGame() {
         <title>Join game | Mahjong Party</title>
       </Helmet>
       <h2>Join an existing game</h2>
-      <form onSubmit={joinGame} autoComplete="off">
+      <form onSubmit={joinGame}>
         <label htmlFor="input_JoinGame_name">Your name</label>
         <input
           type="text"
