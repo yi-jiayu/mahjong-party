@@ -1,3 +1,12 @@
+export interface Room {
+  players: Player[];
+  round: Round;
+}
+
+export interface Player {
+  name: string;
+}
+
 export enum MeldType {
   Chi,
   Pong,
@@ -22,12 +31,24 @@ export interface Hand {
   concealed: TileBag;
 }
 
-export interface Round {
-  seat: number;
-  scores: number[];
+export type TileBag = Record<string, number>;
+
+export enum ActionType {
+  NextRound = "next",
+  Draw = "draw",
+  Discard = "discard",
+  Chi = "chi",
+  Pong = "pong",
+  Gang = "gang",
+  Hu = "hu",
+  EndRound = "end",
 }
 
-export type TileBag = Record<string, number>;
+export interface Action {
+  nonce: number;
+  type: ActionType;
+  Tiles: string[];
+}
 
 export enum EventType {
   Draw = "draw",
@@ -45,8 +66,14 @@ export interface Event {
 }
 
 export interface Round {
+  draws_left: number;
+  scores: number[];
+  seat: number;
   hands: Hand[];
   events: Event[];
+  dealer: number;
+  wind: number;
   turn: number;
   phase: Phase;
+  discards: string[];
 }

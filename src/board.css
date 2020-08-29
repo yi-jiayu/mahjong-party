@@ -1,20 +1,25 @@
 .table {
   display: grid;
   grid-template-columns: 1fr 32px 144px 32px 546px 32px 144px 32px 1fr;
-  grid-template-rows: 32px 144px 32px 258px 32px 144px 32px 1fr;
+  grid-template-rows: auto 32px 144px 32px 258px 32px 144px 32px auto;
   grid-template-areas:
+    ". . i i i i i . ."
     ". . . . t . . . ."
     ". . L . T . R . ."
     ". . L . . . R . ."
-    ". l L . D . R r ."
+    ". l L . C . R r ."
     ". . L . . . R . ."
     ". . L . B . R . ."
     ". . . . b . . . ."
     ". . c c c c c . .";
 }
 
-.discards {
-  grid-area: D;
+.info {
+  grid-area: i;
+}
+
+.centre {
+  grid-area: C;
   align-content: flex-start;
   display: flex;
   flex-wrap: wrap;
@@ -25,6 +30,14 @@
 }
 
 .controls button {
+  margin-right: 8px;
+}
+
+.infobox {
+  padding: 4px 8px;
+  border-radius: 1px;
+  border: 2px solid #4a4a4a;
+  color: #4a4a4a;
   margin-right: 8px;
 }
 
@@ -97,7 +110,7 @@
   background-image: url("tiles/back.svg");
 }
 
-.messages .tile {
+.tile.inline {
   height: 1em;
   width: 0.8125em;
   display: inline-block;

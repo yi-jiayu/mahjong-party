@@ -1,13 +1,13 @@
 import React, { FunctionComponent } from "react";
-import { Meld, MeldType, Phase, Round, TileBag } from "./mahjong";
+import { Meld, MeldType, Phase, Player, Round, TileBag } from "./mahjong";
 
-import "csshake/dist/csshake-little.css";
 import "./board.css";
 import "./tiles.css";
-import styles from "./App.module.css";
 
-function Tile({ tile }: { tile: string }) {
-  return <span className="tile" data-tile={tile} />;
+const WINDS = ["East", "South", "West", "North"];
+
+function Tile({ tile, inline = false }: { tile: string; inline?: boolean }) {
+  return <span className={inline ? "tile inline" : "tile"} data-tile={tile} />;
 }
 
 function Tiles({ tiles }: { tiles: string[] }) {
@@ -44,9 +44,7 @@ const Label: FunctionComponent<{ seat: number }> = ({ seat, children }) => {
   return (
     <>
       <span>{children}</span>
-      {seat === 0 && (
-        <span title="This player is the dealer.">&nbsp;&#9733;</span>
-      )}
+      {seat === 0 && <span title="Dealer">&nbsp;&#9733;</span>}
     </>
   );
 };
@@ -77,13 +75,38 @@ const Status: FunctionComponent<{
   players: { name: string }[];
   round: Round;
 }> = ({ players, round }) => {
-  const { turn, phase } = round;
+  const { seat, turn, phase } = round;
   return (
     <div>
       <strong>
-        {new Date().toLocaleTimeString()} Waiting for {players[turn].name} to{" "}
+        {new Date().toLocaleTimeString()} Waiting for{" "}
+        {seat === turn ? "you" : players[turn].name} to{" "}
         {phase === Phase.Draw ? "draw" : "discard"}...
       </strong>
+    </div>
+  );
+};
+
+const Info: FunctionComponent<{ players: Player[]; round: Round }> = ({
+  players,
+  round,
+}) => {
+  const { wind, dealer, draws_left } = round;
+  return (
+    <div className="info">
+      <span className="infobox">Prevailing wind: {WINDS[wind]}</span>
+      <span className="infobox">Dealer: {players[dealer].name}</span>
+      <span className="infobox">Draws left: {draws_left}</span>
+    </div>
+  );
+};
+
+const Discards: FunctionComponent<{ discards: string[] }> = ({ discards }) => {
+  return (
+    <div className="centre">
+      {discards.map((tile, index) => (
+        <Tile tile={tile} key={tile + index} />
+      ))}
     </div>
   );
 };
@@ -92,12 +115,13 @@ export default function Board({
   players,
   round,
 }: {
-  players: { name: string }[];
+  players: Player[];
   round: Round;
 }) {
-  const { seat, hands } = round;
+  const { seat, hands, discards } = round;
   return (
     <div className="table">
+      <Info players={players} round={round} />
       <Labels players={players} seat={seat} />
       <div className="bottom">
         <Tiles tiles={hands[seat].flowers} />
@@ -123,8 +147,9 @@ export default function Board({
           <Tiles tiles={hands[(seat + 3) % 4].flowers} />
         </div>
       </div>
+      <Discards discards={discards} />
       <div className="controls">
-        <div className={styles.buttonRow}>
+        <div>
           <button type="button" disabled={true}>
             Draw
           </button>
@@ -147,19 +172,19 @@ export default function Board({
         </div>
         <div className="messages">
           <div>
-            13:38 {players[0].name} chi-ed: <Tile tile="13一筒" />
-            <Tile tile="14二筒" />
-            <Tile tile="15三筒" />
+            13:38 {players[0].name} chi-ed: <Tile tile="13一筒" inline />
+            <Tile tile="14二筒" inline />
+            <Tile tile="15三筒" inline />
           </div>
           <div>
             13:34 {players[1].name} drew a tile and got a flower:{" "}
-            <Tile tile="01猫" />
+            <Tile tile="01猫" inline />
           </div>
           <div>
-            13:34 {players[2].name} discarded: <Tile tile="43北风" />
+            13:34 {players[2].name} discarded: <Tile tile="43北风" inline />
           </div>
           <div>
-            13:37 {players[1].name} discarded: <Tile tile="45青发" />
+            13:37 {players[1].name} discarded: <Tile tile="45青发" inline />
           </div>
         </div>
         <Status players={players} round={round} />
