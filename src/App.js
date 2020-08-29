@@ -10,7 +10,6 @@ import "./App.css";
 import Home from "./Home";
 import Room from "./Room";
 import NotFound from "./NotFound";
-import Tutorial from "./Tutorial";
 
 function App() {
   return (
@@ -31,9 +30,6 @@ function App() {
           </Route>
           <Route path="/rooms">
             <Rooms />
-          </Route>
-          <Route path="/tutorial">
-            <Tutorial />
           </Route>
           <Route path="*">
             <NotFound />

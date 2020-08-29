@@ -2,7 +2,7 @@ import React, { SyntheticEvent, useState } from "react";
 import { Link, Route, Switch, useHistory } from "react-router-dom";
 import Helmet from "react-helmet";
 
-import styles from "./Home.module.css";
+import styles from "./App.module.css";
 
 function HostGame() {
   const history = useHistory();
@@ -16,7 +16,7 @@ function HostGame() {
       body: `name=${name}`,
       headers: { "content-type": "application/x-www-form-urlencoded" },
     });
-    const { room_id: roomId } = await resp.json();
+    const roomId = await resp.text();
     history.replace(`/rooms/${roomId}`);
   };
 
@@ -33,7 +33,7 @@ function HostGame() {
           name="name"
           id="input_HostGame_name"
           onChange={(e) => setName(e.target.value)}
-          pattern="[0-9A-Za-z]+"
+          pattern="[0-9A-Za-z ]+"
           required
         />
         <div>
@@ -59,7 +59,7 @@ function JoinGame() {
       body: `name=${encodeURIComponent(name)}`,
       headers: { "content-type": "application/x-www-form-urlencoded" },
     });
-    if (resp.status === 200) {
+    if (resp.ok) {
       history.replace(`/rooms/${room}`);
     }
   };

@@ -1,105 +1,91 @@
 .table {
   display: grid;
-  grid-template-columns: auto 144px 546px 144px auto;
-  grid-template-rows: auto 144px 546px 144px auto;
-}
-
-.status {
-  grid-column: 1 / span 2;
-  grid-row: 1 / span 2;
-}
-
-.labelBottom,
-.labelRight,
-.labelTop,
-.labelLeft {
-  text-align: center;
-}
-
-.actions {
-  grid-column: 4;
-  grid-row: 4 / span 2;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.message {
-  grid-column: 2;
-  grid-row: 4 / span 2;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.actions button {
-  display: block;
-}
-
-.bottom {
-  grid-column-start: 3;
-  grid-row-start: 4;
-}
-
-.labelBottom {
-  grid-column-start: 3;
-  grid-row-start: 5;
-  display: flex;
-  justify-content: center;
-}
-
-.top {
-  grid-column-start: 3;
-  grid-row-start: 2;
-}
-
-.labelTop {
-  grid-column-start: 3;
-  grid-row-start: 1;
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-}
-
-.left {
-  display: flex;
-  grid-column-start: 2;
-  grid-row-start: 3;
-}
-
-.labelLeft {
-  grid-column-start: 1;
-  grid-row-start: 3;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-end;
-}
-
-.right {
-  display: flex;
-  grid-column-start: 4;
-  grid-row-start: 3;
-}
-
-.labelRight {
-  grid-column-start: 5;
-  grid-row-start: 3;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
+  grid-template-columns: 1fr 32px 144px 32px 546px 32px 144px 32px 1fr;
+  grid-template-rows: 32px 144px 32px 258px 32px 144px 32px 1fr;
+  grid-template-areas:
+    ". . . . t . . . ."
+    ". . L . T . R . ."
+    ". . L . . . R . ."
+    ". l L . D . R r ."
+    ". . L . . . R . ."
+    ". . L . B . R . ."
+    ". . . . b . . . ."
+    ". . c c c c c . .";
 }
 
 .discards {
+  grid-area: D;
   align-content: flex-start;
   display: flex;
   flex-wrap: wrap;
-  grid-column-start: 3;
-  grid-row-start: 3;
-  padding: 24px;
+}
+
+.controls {
+  grid-area: c;
+}
+
+.controls button {
+  margin-right: 8px;
+}
+
+.top {
+  grid-area: T;
+}
+
+.bottom {
+  grid-area: B;
+}
+
+.right {
+  grid-area: R;
+}
+
+.hand-right {
+  display: flex;
+  margin: 32px 0;
+}
+
+.left {
+  grid-area: L;
+}
+
+.hand-left {
+  display: flex;
+  margin: 32px 0;
+}
+
+.label-bottom {
+  grid-area: b;
+  text-align: center;
+  line-height: 32px;
+}
+
+.label-right {
+  grid-area: r;
+  text-align: center;
+  line-height: 32px;
+  writing-mode: vertical-lr;
+}
+
+.label-top {
+  grid-area: t;
+  text-align: center;
+  line-height: 32px;
+}
+
+.label-left {
+  grid-area: l;
+  text-align: center;
+  line-height: 32px;
+  writing-mode: vertical-lr;
+  transform: rotate(180deg);
+}
+
+.messages {
+  display: flex;
+  flex-direction: column-reverse;
+  overflow-y: scroll;
+  height: 5em;
 }
 
 .tile {
@@ -109,6 +95,12 @@
   background-repeat: no-repeat;
   background-position: left center;
   background-image: url("tiles/back.svg");
+}
+
+.messages .tile {
+  height: 1em;
+  width: 0.8125em;
+  display: inline-block;
 }
 
 .left .tile,
@@ -124,14 +116,6 @@
 
 .selecting .tile.selected {
   opacity: 1;
-}
-
-.selecting .tile:hover {
-  opacity: 1;
-}
-
-.tile:hover {
-  opacity: 0.5;
 }
 
 .rack {
