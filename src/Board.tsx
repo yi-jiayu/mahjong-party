@@ -23,18 +23,19 @@ const WINDS = ["East", "South", "West", "North"];
 function Tile({
   tile,
   onClick,
-  inline = false,
+  selected,
+  inline,
 }: {
   tile: string;
   onClick?: MouseEventHandler;
+  selected?: boolean;
   inline?: boolean;
 }) {
+  const classes = ["tile"];
+  selected && classes.push("selected");
+  inline && classes.push("inline");
   return (
-    <span
-      className={inline ? "tile inline" : "tile"}
-      data-tile={tile}
-      onClick={onClick}
-    />
+    <span className={classes.join(" ")} data-tile={tile} onClick={onClick} />
   );
 }
 
@@ -63,22 +64,62 @@ function Melds({ melds }: { melds: Meld[] }) {
 
 type TileClickCallback = (tile: string, index: number) => MouseEventHandler;
 
-function Rack({
+function OrderedRack({
   tiles,
   onTileClick,
+  selecting,
+  selected,
 }: {
   tiles: TileBag;
+  selecting?: boolean;
+  selected?: number;
   onTileClick?: TileClickCallback;
 }) {
+  const [order, setOrder] = useState<string[]>(
+    Object.entries(tiles).flatMap(([tile, count]) =>
+      new Array(count).fill(tile)
+    )
+  );
+
+  useEffect(() => {
+    const remaining = Object.assign({}, tiles);
+    let newOrder = order.reduce((ts, t) => {
+      if (remaining[t] > 0) {
+        remaining[t]--;
+        return [...ts, t];
+      }
+      return ts;
+    }, [] as string[]);
+    newOrder = newOrder.concat(
+      Object.entries(remaining).flatMap(([tile, count]) =>
+        new Array(count).fill(tile)
+      )
+    );
+    if (
+      newOrder.length !== order.length ||
+      newOrder.some((value, index) => value !== order[index])
+    ) {
+      setOrder(newOrder);
+    }
+  }, [order, tiles]);
+
+  const elements = order.map((tile, index) => (
+    <Tile
+      tile={tile}
+      key={tile + index}
+      selected={selected === index}
+      onClick={onTileClick ? onTileClick(tile, index) : undefined}
+    />
+  ));
+  return (
+    <div className={selecting ? "rack selecting" : "rack"}>{elements}</div>
+  );
+}
+
+function Rack({ tiles }: { tiles: TileBag }) {
   const elements = Object.entries(tiles)
     .flatMap(([tile, count]) => new Array(count).fill(tile))
-    .map((tile, index) => (
-      <Tile
-        tile={tile}
-        key={tile + index}
-        onClick={onTileClick ? onTileClick(tile, index) : undefined}
-      />
-    ));
+    .map((tile, index) => <Tile tile={tile} key={tile + index} />);
   return <div className="rack">{elements}</div>;
 }
 
@@ -216,6 +257,12 @@ const Controls: FunctionComponent<{
         </button>
         <button
           type="button"
+          disabled={!actions.has(ActionType.Draw)}
+          onClick={() => setPendingAction(ActionType.Chi)}>
+          Chi
+        </button>
+        <button
+          type="button"
           disabled={!actions.has(ActionType.Pong)}
           onClick={() => dispatch(ActionType.Pong)}>
           Pong
@@ -241,6 +288,9 @@ const Controls: FunctionComponent<{
     case ActionType.Discard:
       message = "Select a tile to discard. ";
       break;
+    case ActionType.Chi:
+      message = "Select two tiles to chi. ";
+      break;
     case ActionType.Gang:
       message = "Select a tile to gang. ";
       break;
@@ -261,17 +311,10 @@ const Controls: FunctionComponent<{
 
 const Hands: FunctionComponent<{
   round: Round;
-  tileClickCallback?: TileClickCallback;
-}> = ({ round, tileClickCallback }) => {
+}> = ({ round }) => {
   const { seat, hands } = round;
-
   return (
     <>
-      <div className="bottom">
-        <Tiles tiles={hands[seat].flowers} />
-        <Melds melds={hands[seat].revealed} />
-        <Rack tiles={hands[seat].concealed} onTileClick={tileClickCallback} />
-      </div>
       <div className="right">
         <div className="hand-right">
           <Tiles tiles={hands[(seat + 1) % 4].flowers} />
@@ -306,14 +349,31 @@ export default function Board({
   round: Round;
   dispatch: ActionCallback;
 }) {
-  const { seat, discards } = round;
+  const { seat, hands, discards } = round;
 
   const [pendingAction, setPendingAction] = useState<ActionType | null>(null);
+  const [selected, setSelected] = useState<{ tile: string; index: number }>({
+    tile: "",
+    index: -1,
+  });
 
   let tileClickCallback: TileClickCallback | undefined;
   switch (pendingAction) {
     case ActionType.Discard:
       tileClickCallback = (tile) => () => dispatch(ActionType.Discard, [tile]);
+      break;
+    case ActionType.Chi:
+      tileClickCallback = (tile, index) => () => {
+        const { index: selectedIndex, tile: selectedTile } = selected;
+        if (selectedIndex === index) {
+          setSelected({ tile: "", index: -1 });
+        } else if (selectedIndex === -1) {
+          setSelected({ index, tile });
+        } else {
+          setSelected({ tile: "", index: -1 });
+          dispatch(ActionType.Chi, [selectedTile, tile]);
+        }
+      };
       break;
     case ActionType.Gang:
       tileClickCallback = (tile) => () => dispatch(ActionType.Gang, [tile]);
@@ -322,13 +382,24 @@ export default function Board({
 
   useEffect(() => {
     setPendingAction(null);
+    setSelected({ tile: "", index: -1 });
   }, [nonce]);
 
   return (
     <div className="table">
       <Info players={players} round={round} />
       <Labels players={players} seat={seat} />
-      <Hands round={round} tileClickCallback={tileClickCallback} />
+      <div className="bottom">
+        <Tiles tiles={hands[seat].flowers} />
+        <Melds melds={hands[seat].revealed} />
+        <OrderedRack
+          tiles={hands[seat].concealed}
+          selecting={pendingAction === ActionType.Chi}
+          selected={selected.index}
+          onTileClick={tileClickCallback}
+        />
+      </div>
+      <Hands round={round} />
       <Discards discards={discards} />
       <div className="controls">
         <Controls
