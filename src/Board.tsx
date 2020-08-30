@@ -163,12 +163,22 @@ function allowedActions(round: Round): Set<ActionType> {
     seat !== previousTurn &&
     phase === Phase.Draw &&
     lastDiscard &&
-    hands[seat].concealed[lastDiscard] > 2;
+    hands[seat].concealed[lastDiscard] > 1;
   const canGangFromDiscard =
     seat !== previousTurn &&
     phase === Phase.Draw &&
     lastDiscard &&
-    hands[seat].concealed[lastDiscard] > 3;
+    hands[seat].concealed[lastDiscard] > 2;
+  const canGangFromHand =
+    canDiscard &&
+    Object.entries(hands[seat].concealed).some(([_, count]) => count > 3);
+  const canUpgradePongToGang =
+    canDiscard &&
+    hands[seat].revealed
+      .filter(({ type }) => type === MeldType.Pong)
+      .map(({ tiles: [tile] }) => tile)
+      .some((tile) => hands[seat].concealed[tile] > 0);
+  const canGang = canGangFromDiscard || canGangFromHand || canUpgradePongToGang;
   const canHuFromDiscard =
     seat !== previousTurn && phase === Phase.Draw && lastDiscard;
   const canHu = canDiscard && canHuFromDiscard;
@@ -177,17 +187,18 @@ function allowedActions(round: Round): Set<ActionType> {
   canDraw && actions.add(ActionType.Draw);
   canDiscard && actions.add(ActionType.Discard);
   canPong && actions.add(ActionType.Pong);
-  canGangFromDiscard && actions.add(ActionType.Gang);
+  canGang && actions.add(ActionType.Gang);
   canHu && actions.add(ActionType.Hu);
   return actions;
 }
 
 const Controls: FunctionComponent<{
+  round: Round;
   pendingAction: ActionType | null;
   setPendingAction: React.Dispatch<React.SetStateAction<ActionType | null>>;
   actions: Set<ActionType>;
   dispatch: ActionCallback;
-}> = ({ pendingAction, setPendingAction, actions, dispatch }) => {
+}> = ({ round, pendingAction, setPendingAction, actions, dispatch }) => {
   if (pendingAction === null) {
     return (
       <div>
@@ -212,7 +223,11 @@ const Controls: FunctionComponent<{
         <button
           type="button"
           disabled={!actions.has(ActionType.Gang)}
-          onClick={() => dispatch(ActionType.Gang)}>
+          onClick={
+            round.phase === Phase.Discard
+              ? () => setPendingAction(ActionType.Gang)
+              : () => dispatch(ActionType.Gang)
+          }>
           Gang
         </button>
         <button type="button" onClick={() => dispatch(ActionType.Hu)}>
@@ -225,6 +240,10 @@ const Controls: FunctionComponent<{
   switch (pendingAction) {
     case ActionType.Discard:
       message = "Select a tile to discard. ";
+      break;
+    case ActionType.Gang:
+      message = "Select a tile to gang. ";
+      break;
   }
   return (
     <div>
@@ -295,6 +314,10 @@ export default function Board({
   switch (pendingAction) {
     case ActionType.Discard:
       tileClickCallback = (tile) => () => dispatch(ActionType.Discard, [tile]);
+      break;
+    case ActionType.Gang:
+      tileClickCallback = (tile) => () => dispatch(ActionType.Gang, [tile]);
+      break;
   }
 
   useEffect(() => {
@@ -309,6 +332,7 @@ export default function Board({
       <Discards discards={discards} />
       <div className="controls">
         <Controls
+          round={round}
           pendingAction={pendingAction}
           setPendingAction={setPendingAction}
           actions={allowedActions(round)}
