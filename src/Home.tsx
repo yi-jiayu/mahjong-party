@@ -63,6 +63,9 @@ function JoinGame() {
       history.replace(`/rooms/${room}`);
     } else if (resp.status === 404) {
       alert("Room not found!");
+    } else if (resp.status === 400) {
+      const error = await resp.text();
+      alert(error);
     }
   };
 
