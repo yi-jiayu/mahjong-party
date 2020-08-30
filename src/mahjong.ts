@@ -1,6 +1,10 @@
 export interface Room {
+  id: string;
+  nonce: number;
+  phase: number;
   players: Player[];
   round: Round;
+  inside: boolean;
 }
 
 export interface Player {
@@ -15,9 +19,9 @@ export enum MeldType {
 }
 
 export enum Phase {
-  Draw,
-  Discard,
-  Finished,
+  Draw = "draw",
+  Discard = "discard",
+  Finished = "finished",
 }
 
 export interface Meld {
@@ -50,6 +54,8 @@ export interface Action {
   Tiles: string[];
 }
 
+export type ActionCallback = (type: ActionType, tiles?: string[]) => void;
+
 export enum EventType {
   Draw = "draw",
   Discard = "discard",
@@ -76,4 +82,6 @@ export interface Round {
   turn: number;
   phase: Phase;
   discards: string[];
+  last_action_time: number;
+  reserved_duration: number;
 }

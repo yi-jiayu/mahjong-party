@@ -4,7 +4,7 @@ import { useHistory, useParams } from "react-router-dom";
 import produce from "immer";
 import NotFound from "./NotFound";
 import Board from "./Board";
-import { Round } from "./mahjong";
+import { ActionType, Round } from "./mahjong";
 
 const PHASE_NOT_FOUND = -1;
 const PHASE_LOBBY = 0;
@@ -132,20 +132,33 @@ export default function Room() {
     return () => eventSource.close();
   }, [roomId]);
 
-  const startGame = async () => {
+  const dispatch = async (type: ActionType, tiles: string[] = []) => {
     await fetch(`/api/rooms/${roomId}/actions`, {
       method: "post",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ nonce: room.nonce, type: "next" }),
+      body: JSON.stringify({ nonce: room.nonce, type: type, tiles: tiles }),
     });
   };
 
   switch (room.phase) {
     case PHASE_LOBBY:
-      return <Lobby roomId={roomId} room={room} startGame={startGame} />;
+      return (
+        <Lobby
+          roomId={roomId}
+          room={room}
+          startGame={() => dispatch(ActionType.NextRound)}
+        />
+      );
     case PHASE_IN_PROGRESS:
       if (room.round) {
-        return <Board players={room.players} round={room.round} />;
+        return (
+          <Board
+            nonce={room.nonce}
+            players={room.players}
+            round={room.round}
+            dispatch={dispatch}
+          />
+        );
       }
       break;
     case PHASE_NOT_FOUND:
