@@ -8,6 +8,15 @@ const Controls: FunctionComponent<{
   actions: Set<ActionType>;
   dispatch: ActionCallback;
 }> = ({ round, pendingAction, setPendingAction, actions, dispatch }) => {
+  if (round.phase === Phase.Finished) {
+    return (
+      <div>
+        <button type="button" onClick={() => dispatch(ActionType.NextRound)}>
+          Next round
+        </button>
+      </div>
+    );
+  }
   if (pendingAction === null) {
     return (
       <div>
