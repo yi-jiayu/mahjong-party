@@ -51,6 +51,8 @@
 
 .right {
   grid-area: R;
+  display: flex;
+  flex-direction: column-reverse;
 }
 
 .hand-right {
