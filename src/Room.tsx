@@ -3,7 +3,7 @@ import styles from "./App.module.css";
 import { useHistory, useParams } from "react-router-dom";
 import produce from "immer";
 import NotFound from "./NotFound";
-import Board from "./Board";
+import Board from "./board/Board";
 import { ActionType, Round } from "./mahjong";
 
 const PHASE_NOT_FOUND = -1;
