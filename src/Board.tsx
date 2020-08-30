@@ -154,13 +154,31 @@ const Discards: FunctionComponent<{ discards: string[] }> = ({ discards }) => {
 };
 
 function allowedActions(round: Round): Set<ActionType> {
-  const { seat, turn, phase } = round;
+  const { seat, turn, phase, discards, hands } = round;
+  const previousTurn = (turn + 3) % 4;
+  const lastDiscard = discards.length > 0 && discards[discards.length - 1];
   const canDraw = turn === seat && phase === Phase.Draw;
   const canDiscard = turn === seat && phase === Phase.Discard;
+  const canPong =
+    seat !== previousTurn &&
+    phase === Phase.Draw &&
+    lastDiscard &&
+    hands[seat].concealed[lastDiscard] > 2;
+  const canGangFromDiscard =
+    seat !== previousTurn &&
+    phase === Phase.Draw &&
+    lastDiscard &&
+    hands[seat].concealed[lastDiscard] > 3;
+  const canHuFromDiscard =
+    seat !== previousTurn && phase === Phase.Draw && lastDiscard;
+  const canHu = canDiscard && canHuFromDiscard;
 
   const actions = new Set<ActionType>();
   canDraw && actions.add(ActionType.Draw);
   canDiscard && actions.add(ActionType.Discard);
+  canPong && actions.add(ActionType.Pong);
+  canGangFromDiscard && actions.add(ActionType.Gang);
+  canHu && actions.add(ActionType.Hu);
   return actions;
 }
 
@@ -184,6 +202,21 @@ const Controls: FunctionComponent<{
           disabled={!actions.has(ActionType.Discard)}
           onClick={() => setPendingAction(ActionType.Discard)}>
           Discard
+        </button>
+        <button
+          type="button"
+          disabled={!actions.has(ActionType.Pong)}
+          onClick={() => dispatch(ActionType.Pong)}>
+          Pong
+        </button>
+        <button
+          type="button"
+          disabled={!actions.has(ActionType.Gang)}
+          onClick={() => dispatch(ActionType.Gang)}>
+          Gang
+        </button>
+        <button type="button" onClick={() => dispatch(ActionType.Hu)}>
+          Hu
         </button>
       </div>
     );
