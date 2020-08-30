@@ -13,7 +13,7 @@ const Label: FunctionComponent<LabelProps> = ({ seat, players, scores }) => {
       {seat === 0 && "★ "}
       {players[seat].name}
       {": "}
-      <span className="score">{scores[seat]}</span>
+      <span className="score">{20000 + scores[seat] * 100}</span>
     </div>
   );
 };
