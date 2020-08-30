@@ -133,11 +133,15 @@ export default function Room() {
   }, [roomId]);
 
   const dispatch = async (type: ActionType, tiles: string[] = []) => {
-    await fetch(`/api/rooms/${roomId}/actions`, {
+    const resp = await fetch(`/api/rooms/${roomId}/actions`, {
       method: "post",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ nonce: room.nonce, type: type, tiles: tiles }),
     });
+    if (!resp.ok) {
+      const reason = await resp.text();
+      alert(reason);
+    }
   };
 
   switch (room.phase) {
