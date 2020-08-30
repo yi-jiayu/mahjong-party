@@ -61,6 +61,8 @@ function JoinGame() {
     });
     if (resp.ok) {
       history.replace(`/rooms/${room}`);
+    } else if (resp.status === 404) {
+      alert("Room not found!");
     }
   };
 
