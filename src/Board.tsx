@@ -13,6 +13,8 @@ import {
   Player,
   Round,
   TileBag,
+  Event,
+  EventType,
 } from "./mahjong";
 
 import "./board.css";
@@ -158,11 +160,11 @@ const Status: FunctionComponent<{
   players: { name: string }[];
   round: Round;
 }> = ({ players, round }) => {
-  const { seat, turn, phase } = round;
+  const { seat, turn, phase, last_action_time } = round;
   return (
     <div>
       <strong>
-        {new Date().toLocaleTimeString()} Waiting for{" "}
+        {new Date(last_action_time).toLocaleTimeString()} Waiting for{" "}
         {seat === turn ? "you" : players[turn].name} to{" "}
         {phase === Phase.Draw ? "draw" : "discard"}...
       </strong>
@@ -338,6 +340,55 @@ const Hands: FunctionComponent<{
   );
 };
 
+const Message: FunctionComponent<{
+  players: Player[];
+  event: Event;
+}> = ({ players, event }) => {
+  const timestamp = new Date(event.time);
+  let message = `${players[event.seat].name} `;
+  let tiles = event.tiles || [];
+  switch (event.type) {
+    case EventType.Draw:
+      message += "drew a tile.";
+      break;
+    case EventType.Discard:
+      message += "discarded ";
+      break;
+    case EventType.Chi:
+      message += "chi-ed ";
+      break;
+    case EventType.Pong:
+      message += "pong-ed ";
+      break;
+    case EventType.Gang:
+      message += "gang-ed ";
+      break;
+  }
+  return (
+    <div className="message">
+      <span>{timestamp.toLocaleTimeString()}</span> {message}
+      {tiles.map((tile, index) => (
+        <Tile tile={tile} inline={true} key={index} />
+      ))}
+    </div>
+  );
+};
+
+const Messages: FunctionComponent<{
+  players: Player[];
+  events: Event[];
+}> = ({ players, events }) => {
+  return (
+    <div className="messages">
+      {events
+        .map((event, index) => (
+          <Message players={players} event={event} key={index} />
+        ))
+        .reverse()}
+    </div>
+  );
+};
+
 export default function Board({
   nonce,
   players,
@@ -349,7 +400,7 @@ export default function Board({
   round: Round;
   dispatch: ActionCallback;
 }) {
-  const { seat, hands, discards } = round;
+  const { seat, hands, discards, events } = round;
 
   const [pendingAction, setPendingAction] = useState<ActionType | null>(null);
   const [selected, setSelected] = useState<{ tile: string; index: number }>({
@@ -409,23 +460,7 @@ export default function Board({
           actions={allowedActions(round)}
           dispatch={dispatch}
         />
-        <div className="messages">
-          <div>
-            13:38 {players[0].name} chi-ed: <Tile tile="13一筒" inline />
-            <Tile tile="14二筒" inline />
-            <Tile tile="15三筒" inline />
-          </div>
-          <div>
-            13:34 {players[1].name} drew a tile and got a flower:{" "}
-            <Tile tile="01猫" inline />
-          </div>
-          <div>
-            13:34 {players[2].name} discarded: <Tile tile="43北风" inline />
-          </div>
-          <div>
-            13:37 {players[1].name} discarded: <Tile tile="45青发" inline />
-          </div>
-        </div>
+        <Messages players={players} events={events} />
         <Status players={players} round={round} />
       </div>
     </div>
