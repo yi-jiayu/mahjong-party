@@ -8,8 +8,8 @@ import {
   Round,
 } from "../mahjong";
 
-import "../board.css";
-import "../tiles.css";
+import "./board.css";
+import "./tiles.css";
 
 import { TileClickCallback } from "./types";
 import OrderedRack from "./OrderedRack";
