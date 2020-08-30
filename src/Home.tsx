@@ -141,7 +141,6 @@ export default function Home() {
           </div>
           <h1>Mahjong Party</h1>
           <p>Play Singaporean mahjong online with friends!</p>
-          <Link to="/tutorial">Tutorial</Link>
           <Link to="/host">Host game</Link>
           <Link to="/join">Join game</Link>
           <Link to="/about">About</Link>
