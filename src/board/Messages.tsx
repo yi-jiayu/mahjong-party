@@ -7,23 +7,33 @@ const Message: FunctionComponent<{
   event: Event;
 }> = ({ players, event }) => {
   const timestamp = new Date(event.time);
-  let message = `${players[event.seat].name} `;
   let tiles = event.tiles || [];
+  let name = players[event.seat].name;
+  let message: string;
   switch (event.type) {
+    case EventType.Start:
+      message = `Round started.`;
+      break;
     case EventType.Draw:
-      message += "drew a tile.";
+      message = `${name} drew a tile.`;
       break;
     case EventType.Discard:
-      message += "discarded ";
+      message = `${name} discarded `;
       break;
     case EventType.Chi:
-      message += "chi-ed ";
+      message = `${name} chi-ed `;
       break;
     case EventType.Pong:
-      message += "pong-ed ";
+      message = `${name} pong-ed `;
       break;
     case EventType.Gang:
-      message += "gang-ed ";
+      message = `${name} gang-ed `;
+      break;
+    case EventType.Hu:
+      message = `Round over. ${name} won!`;
+      break;
+    case EventType.End:
+      message = `Round over. Nobody won.`;
       break;
   }
   return (

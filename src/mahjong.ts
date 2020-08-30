@@ -57,11 +57,14 @@ export interface Action {
 export type ActionCallback = (type: ActionType, tiles?: string[]) => void;
 
 export enum EventType {
+  Start = "start",
   Draw = "draw",
   Discard = "discard",
   Chi = "chi",
   Pong = "pong",
   Gang = "gang",
+  Hu = "hu",
+  End = "end",
 }
 
 export interface Event {

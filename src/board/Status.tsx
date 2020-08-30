@@ -6,12 +6,20 @@ const Status: FunctionComponent<{
   round: Round;
 }> = ({ players, round }) => {
   const { seat, turn, phase, last_action_time } = round;
+  const timestamp = new Date(last_action_time);
+  let message: string;
+  if (phase === Phase.Finished) {
+    message = "Waiting for next round to begin...";
+  } else {
+    const name = players[turn].name;
+    message = `Waiting for ${seat === turn ? "you" : name} to ${
+      phase === Phase.Draw ? "draw" : "discard"
+    }...`;
+  }
   return (
     <div>
       <strong>
-        {new Date(last_action_time).toLocaleTimeString()} Waiting for{" "}
-        {seat === turn ? "you" : players[turn].name} to{" "}
-        {phase === Phase.Draw ? "draw" : "discard"}...
+        <span>{timestamp.toLocaleTimeString()}</span> {message}
       </strong>
     </div>
   );
