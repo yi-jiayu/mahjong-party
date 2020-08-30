@@ -73,7 +73,7 @@ export default function Board({
   round: Round;
   dispatch: ActionCallback;
 }) {
-  const { seat, hands, discards, events } = round;
+  const { seat, hands, discards, events, scores } = round;
 
   const [pendingAction, setPendingAction] = useState<ActionType | null>(null);
   const [selected, setSelected] = useState<{ tile: string; index: number }>({
@@ -112,7 +112,7 @@ export default function Board({
   return (
     <div className="table">
       <Info players={players} round={round} />
-      <Labels players={players} seat={seat} />
+      <Labels players={players} seat={seat} scores={scores} />
       <div className="bottom">
         <Tiles tiles={hands[seat].flowers} />
         <Melds melds={hands[seat].revealed} />
