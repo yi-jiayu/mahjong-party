@@ -71,6 +71,17 @@ function Lobby({
     }
   };
 
+  const addBot = async () => {
+    const resp = await fetch(`/api/rooms/${roomId}/bots`, {
+      method: "post",
+      credentials: "include",
+    });
+    if (!resp.ok) {
+      const reason = await resp.text();
+      alert(reason);
+    }
+  };
+
   return (
     <main>
       <h2>{roomId}</h2>
@@ -89,6 +100,12 @@ function Lobby({
         <div className={styles.buttonRow}>
           <button type="button" onClick={leaveRoom}>
             Leave room
+          </button>
+          <button
+            type="button"
+            disabled={players.length === 4}
+            onClick={addBot}>
+            Add bot
           </button>
           <button
             type="button"
