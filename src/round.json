@@ -1,0 +1,78 @@
+{
+  "seat": 0,
+  "scores": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "hands": [
+    {
+      "flowers": [
+        "01猫"
+      ],
+      "revealed": [],
+      "concealed": {
+        "15三筒": 1,
+        "22一索": 1,
+        "25四索": 1,
+        "26五索": 2,
+        "29八索": 1,
+        "30九索": 2,
+        "33三万": 2,
+        "34四万": 1,
+        "43北风": 1,
+        "44红中": 1,
+        "45青发": 1
+      }
+    },
+    {
+      "flowers": [
+        "07菊"
+      ],
+      "revealed": [],
+      "concealed": {
+        "": 13
+      }
+    },
+    {
+      "flowers": [],
+      "revealed": [],
+      "concealed": {
+        "": 13
+      }
+    },
+    {
+      "flowers": [
+        "05梅"
+      ],
+      "revealed": [],
+      "concealed": {
+        "": 13
+      }
+    }
+  ],
+  "draws_left": 77,
+  "discards": [],
+  "wind": 0,
+  "dealer": 0,
+  "turn": 0,
+  "phase": "discard",
+  "events": [
+    {
+      "type": "start",
+      "seat": 0,
+      "time": 1598882800780,
+      "tiles": null
+    }
+  ],
+  "result": {
+    "dealer": 0,
+    "wind": 0,
+    "winner": 0,
+    "points": 0,
+    "winning_tiles": null
+  },
+  "last_action_time": 1598882800780,
+  "reserved_duration": 2000
+}

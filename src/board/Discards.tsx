@@ -23,7 +23,9 @@ const Discards: FunctionComponent<{
     <div
       ref={drop}
       className="centre"
-      style={{ opacity: canDiscard && isOver ? 0.5 : 1 }}>
+      style={{
+        backgroundColor: canDiscard && isOver ? "#f1f1f1" : "transparent",
+      }}>
       {discards.map((tile, index) => (
         <Tile tile={tile} key={tile + index} />
       ))}

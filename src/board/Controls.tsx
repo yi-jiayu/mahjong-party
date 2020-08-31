@@ -88,7 +88,7 @@ const Controls: FunctionComponent<{
   if (pendingAction === null) {
     const actions = allowedActions(round);
     return (
-      <div>
+      <div className="controls">
         {actions.has(ActionType.EndRound) ? (
           <button
             type="button"

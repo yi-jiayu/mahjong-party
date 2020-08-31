@@ -1,4 +1,9 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, {
+  FunctionComponent,
+  useEffect,
+  useReducer,
+  useState,
+} from "react";
 import { ActionCallback, ActionType, Phase, Player, Round } from "../mahjong";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -80,17 +85,12 @@ const reduceTiles = (
   }
 };
 
-export default function Board({
-  nonce,
-  players,
-  round,
-  dispatchAction,
-}: {
+const Board: FunctionComponent<{
   nonce: number;
   players: Player[];
   round: Round;
   dispatchAction: ActionCallback;
-}) {
+}> = ({ nonce, players, round, dispatchAction, children }) => {
   const {
     seat,
     hands,
@@ -162,24 +162,29 @@ export default function Board({
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="table">
+        {children}
         <Info players={players} round={round} />
         <Labels players={players} seat={seat} scores={scores} />
         <div className="bottom">
           <Tiles tiles={hands[seat].flowers} />
           <Melds melds={hands[seat].revealed} />
-          {pendingAction === null ? (
-            <SortableRack
-              tiles={tiles}
-              moveTile={(from, to) => dispatchTiles({ type: "move", from, to })}
-            />
-          ) : (
-            <SelectableRack
-              tiles={tiles}
-              selecting={pendingAction === ActionType.Chi}
-              selected={selected.indexes}
-              onTileClick={tileClickCallback}
-            />
-          )}
+          <div className="tutorial-your_tiles">
+            {pendingAction === null ? (
+              <SortableRack
+                tiles={tiles}
+                moveTile={(from, to) =>
+                  dispatchTiles({ type: "move", from, to })
+                }
+              />
+            ) : (
+              <SelectableRack
+                tiles={tiles}
+                selecting={pendingAction === ActionType.Chi}
+                selected={selected.indexes}
+                onTileClick={tileClickCallback}
+              />
+            )}
+          </div>
         </div>
         <Hands round={round} />
         <Discards
@@ -187,7 +192,7 @@ export default function Board({
           canDiscard={turn === seat && phase === Phase.Discard}
           discardTile={(tile) => dispatchAction(ActionType.Discard, [tile])}
         />
-        <div className="controls">
+        <div className="underneath">
           <Controls
             round={round}
             isReservedDuration={isReservedDuration}
@@ -209,4 +214,6 @@ export default function Board({
       </div>
     </DndProvider>
   );
-}
+};
+
+export default Board;
