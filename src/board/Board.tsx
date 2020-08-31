@@ -1,11 +1,14 @@
 import React, { useEffect, useReducer, useState } from "react";
 import { ActionCallback, ActionType, Player, Round } from "../mahjong";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 import "./board.css";
 import "./tiles.css";
 
 import { TileClickCallback, TilesAction } from "./types";
-import OrderedRack from "./OrderedRack";
+import SortableRack from "./SortableRack";
+import SelectableRack from "./SelectableRack";
 import Controls from "./Controls";
 import Messages from "./Messages";
 import Tiles from "./Tiles";
@@ -41,29 +44,38 @@ const reduceSelected = (
   }
 };
 
-const reduceTiles = (state: string[], action: TilesAction) => {
+const reduceTiles = (
+  state: Array<{ tile: string; id: number }>,
+  action: TilesAction
+) => {
   switch (action.type) {
+    case "move":
+      return produce(state, (draft) => {
+        draft.splice(action.from, 1);
+        draft.splice(action.to, 0, state[action.from]);
+      });
     case "update":
       const remaining = { ...action.tiles };
-      state = state.reduce((tiles, tile) => {
+      let tiles = state.reduce((tiles, { tile }) => {
         if (remaining[tile] > 0) {
           remaining[tile]--;
           return [...tiles, tile];
         }
         return tiles;
       }, [] as string[]);
-      return state.concat(
+      tiles = tiles.concat(
         Object.entries(remaining).flatMap(([tile, count]) =>
           new Array(count).fill(tile)
         )
       );
+      return tiles.map((tile, index) => ({ tile, id: index }));
     case "remove":
       return produce(state, (draft) => {
         draft.splice(action.index, 1);
       });
     case "sort":
       return produce(state, (draft) => {
-        draft.sort();
+        draft.sort(({ tile: a }, { tile: b }) => (a < b ? -1 : a > b ? 1 : 0));
       });
   }
 };
@@ -146,37 +158,49 @@ export default function Board({
   }, [concealed]);
 
   return (
-    <div className="table">
-      <Info players={players} round={round} />
-      <Labels players={players} seat={seat} scores={scores} />
-      <div className="bottom">
-        <Tiles tiles={hands[seat].flowers} />
-        <Melds melds={hands[seat].revealed} />
-        <OrderedRack
-          tiles={tiles}
-          selecting={pendingAction === ActionType.Chi}
-          selected={selected.indexes}
-          onTileClick={tileClickCallback}
-        />
+    <DndProvider backend={HTML5Backend}>
+      <div className="table">
+        <Info players={players} round={round} />
+        <Labels players={players} seat={seat} scores={scores} />
+        <div className="bottom">
+          <Tiles tiles={hands[seat].flowers} />
+          <Melds melds={hands[seat].revealed} />
+          {pendingAction === null ? (
+            <SortableRack
+              tiles={tiles}
+              moveTile={(from, to) => dispatchTiles({ type: "move", from, to })}
+            />
+          ) : (
+            <SelectableRack
+              tiles={tiles}
+              selecting={pendingAction === ActionType.Chi}
+              selected={selected.indexes}
+              onTileClick={tileClickCallback}
+            />
+          )}
+        </div>
+        <Hands round={round} />
+        <Discards discards={discards} />
+        <div className="controls">
+          <Controls
+            round={round}
+            isReservedDuration={isReservedDuration}
+            pendingAction={pendingAction}
+            setPendingAction={setPendingAction}
+            tilesAreSorted={tiles.every(
+              ({ tile }, i) => i === 0 || tiles[i - 1].tile <= tile
+            )}
+            sortTiles={() => dispatchTiles({ type: "sort" })}
+            dispatchAction={dispatchAction}
+          />
+          <Messages players={players} events={events} />
+          <Status
+            players={players}
+            round={round}
+            isReservedDuration={isReservedDuration}
+          />
+        </div>
       </div>
-      <Hands round={round} />
-      <Discards discards={discards} />
-      <div className="controls">
-        <Controls
-          round={round}
-          isReservedDuration={isReservedDuration}
-          pendingAction={pendingAction}
-          setPendingAction={setPendingAction}
-          dispatchTiles={dispatchTiles}
-          dispatchAction={dispatchAction}
-        />
-        <Messages players={players} events={events} />
-        <Status
-          players={players}
-          round={round}
-          isReservedDuration={isReservedDuration}
-        />
-      </div>
-    </div>
+    </DndProvider>
   );
 }

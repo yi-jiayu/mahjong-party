@@ -7,7 +7,6 @@ import {
   Round,
   sequences,
 } from "../mahjong";
-import { TilesAction } from "./types";
 
 function allowedActions(round: Round): Set<ActionType> {
   const { seat, turn, phase, discards, hands, draws_left } = round;
@@ -63,14 +62,16 @@ const Controls: FunctionComponent<{
   isReservedDuration: boolean;
   pendingAction: ActionType | null;
   setPendingAction: React.Dispatch<React.SetStateAction<ActionType | null>>;
-  dispatchTiles: React.Dispatch<TilesAction>;
+  tilesAreSorted: boolean;
+  sortTiles: () => void;
   dispatchAction: ActionCallback;
 }> = ({
   round,
   isReservedDuration,
   pendingAction,
   setPendingAction,
-  dispatchTiles,
+  tilesAreSorted,
+  sortTiles,
   dispatchAction,
 }) => {
   if (round.phase === Phase.Finished) {
@@ -138,7 +139,7 @@ const Controls: FunctionComponent<{
           onClick={() => dispatchAction(ActionType.Hu)}>
           Hu
         </button>
-        <button type="button" onClick={() => dispatchTiles({ type: "sort" })}>
+        <button type="button" disabled={tilesAreSorted} onClick={sortTiles}>
           Sort tiles
         </button>
       </div>

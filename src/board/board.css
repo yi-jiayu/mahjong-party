@@ -133,6 +133,14 @@
   opacity: 1;
 }
 
+.tile.draggable {
+  cursor: move;
+}
+
+.tile.dragging {
+  opacity: 0;
+}
+
 .rack {
   display: flex;
 }

@@ -9,4 +9,5 @@ export type TileClickCallback = (
 export type TilesAction =
   | { type: "sort" }
   | { type: "update"; tiles: TileBag }
-  | { type: "remove"; index: number };
+  | { type: "remove"; index: number }
+  | { type: "move"; from: number; to: number };
