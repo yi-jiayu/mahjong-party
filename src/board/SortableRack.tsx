@@ -1,13 +1,8 @@
 import React, { useRef } from "react";
 import { useDrag, useDrop, XYCoord } from "react-dnd";
+import { DraggedTile } from "./types";
 
 // Based on https://react-dnd.github.io/react-dnd/examples/sortable/simple
-
-type DraggedTile = {
-  type: "tile";
-  tile: string;
-  index: number;
-};
 
 const Tile: React.FC<{
   tile: string;

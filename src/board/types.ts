@@ -11,3 +11,9 @@ export type TilesAction =
   | { type: "update"; tiles: TileBag }
   | { type: "remove"; index: number }
   | { type: "move"; from: number; to: number };
+
+export type DraggedTile = {
+  type: "tile";
+  tile: string;
+  index: number;
+};

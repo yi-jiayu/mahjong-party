@@ -1,5 +1,5 @@
 import React, { useEffect, useReducer, useState } from "react";
-import { ActionCallback, ActionType, Player, Round } from "../mahjong";
+import { ActionCallback, ActionType, Phase, Player, Round } from "../mahjong";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
@@ -95,6 +95,8 @@ export default function Board({
     seat,
     hands,
     discards,
+    turn,
+    phase,
     events,
     scores,
     last_action_time,
@@ -180,7 +182,11 @@ export default function Board({
           )}
         </div>
         <Hands round={round} />
-        <Discards discards={discards} />
+        <Discards
+          discards={discards}
+          canDiscard={turn === seat && phase === Phase.Discard}
+          discardTile={(tile) => dispatchAction(ActionType.Discard, [tile])}
+        />
         <div className="controls">
           <Controls
             round={round}
