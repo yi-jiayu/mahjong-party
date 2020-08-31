@@ -1,10 +1,10 @@
 import React, { useEffect, useReducer, useState } from "react";
-import { ActionCallback, ActionType, Player, Round, TileBag } from "../mahjong";
+import { ActionCallback, ActionType, Player, Round } from "../mahjong";
 
 import "./board.css";
 import "./tiles.css";
 
-import { TileClickCallback } from "./types";
+import { TileClickCallback, TilesAction } from "./types";
 import OrderedRack from "./OrderedRack";
 import Controls from "./Controls";
 import Messages from "./Messages";
@@ -41,10 +41,6 @@ const reduceSelected = (
   }
 };
 
-type TilesAction =
-  | { type: "update"; tiles: TileBag }
-  | { type: "remove"; index: number };
-
 const reduceTiles = (state: string[], action: TilesAction) => {
   switch (action.type) {
     case "update":
@@ -64,6 +60,10 @@ const reduceTiles = (state: string[], action: TilesAction) => {
     case "remove":
       return produce(state, (draft) => {
         draft.splice(action.index, 1);
+      });
+    case "sort":
+      return produce(state, (draft) => {
+        draft.sort();
       });
   }
 };
@@ -167,6 +167,7 @@ export default function Board({
           isReservedDuration={isReservedDuration}
           pendingAction={pendingAction}
           setPendingAction={setPendingAction}
+          dispatchTiles={dispatchTiles}
           dispatchAction={dispatchAction}
         />
         <Messages players={players} events={events} />

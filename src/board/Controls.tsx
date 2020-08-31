@@ -1,5 +1,6 @@
 import React, { FunctionComponent } from "react";
 import { ActionCallback, ActionType, MeldType, Phase, Round } from "../mahjong";
+import { TilesAction } from "./types";
 
 function allowedActions(round: Round): Set<ActionType> {
   const { seat, turn, phase, discards, hands, draws_left } = round;
@@ -47,12 +48,14 @@ const Controls: FunctionComponent<{
   isReservedDuration: boolean;
   pendingAction: ActionType | null;
   setPendingAction: React.Dispatch<React.SetStateAction<ActionType | null>>;
+  dispatchTiles: React.Dispatch<TilesAction>;
   dispatchAction: ActionCallback;
 }> = ({
   round,
   isReservedDuration,
   pendingAction,
   setPendingAction,
+  dispatchTiles,
   dispatchAction,
 }) => {
   if (round.phase === Phase.Finished) {
@@ -70,6 +73,9 @@ const Controls: FunctionComponent<{
     const actions = allowedActions(round);
     return (
       <div>
+        <button type="button" onClick={() => dispatchTiles({ type: "sort" })}>
+          Sort tiles
+        </button>
         {actions.has(ActionType.EndRound) ? (
           <button
             type="button"
