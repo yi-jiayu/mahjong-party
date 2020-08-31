@@ -1,12 +1,5 @@
 import React, { useEffect, useReducer, useState } from "react";
-import {
-  ActionCallback,
-  ActionType,
-  MeldType,
-  Phase,
-  Player,
-  Round,
-} from "../mahjong";
+import { ActionCallback, ActionType, Player, Round } from "../mahjong";
 
 import "./board.css";
 import "./tiles.css";
@@ -22,45 +15,6 @@ import Hands from "./Hands";
 import Status from "./Status";
 import Info from "./Info";
 import Discards from "./Discards";
-
-function allowedActions(round: Round): Set<ActionType> {
-  const { seat, turn, phase, discards, hands } = round;
-  const previousTurn = (turn + 3) % 4;
-  const lastDiscard = discards.length > 0 && discards[discards.length - 1];
-  const canDraw = turn === seat && phase === Phase.Draw;
-  const canDiscard = turn === seat && phase === Phase.Discard;
-  const canPong =
-    seat !== previousTurn &&
-    phase === Phase.Draw &&
-    lastDiscard &&
-    hands[seat].concealed[lastDiscard] > 1;
-  const canGangFromDiscard =
-    seat !== previousTurn &&
-    phase === Phase.Draw &&
-    lastDiscard &&
-    hands[seat].concealed[lastDiscard] > 2;
-  const canGangFromHand =
-    canDiscard &&
-    Object.entries(hands[seat].concealed).some(([_, count]) => count > 3);
-  const canUpgradePongToGang =
-    canDiscard &&
-    hands[seat].revealed
-      .filter(({ type }) => type === MeldType.Pong)
-      .map(({ tiles: [tile] }) => tile)
-      .some((tile) => hands[seat].concealed[tile] > 0);
-  const canGang = canGangFromDiscard || canGangFromHand || canUpgradePongToGang;
-  const canHuFromDiscard =
-    seat !== previousTurn && phase === Phase.Draw && lastDiscard;
-  const canHu = canDiscard && canHuFromDiscard;
-
-  const actions = new Set<ActionType>();
-  canDraw && actions.add(ActionType.Draw);
-  canDiscard && actions.add(ActionType.Discard);
-  canPong && actions.add(ActionType.Pong);
-  canGang && actions.add(ActionType.Gang);
-  canHu && actions.add(ActionType.Hu);
-  return actions;
-}
 
 type SelectedState = { tiles: string[]; indexes: number[] };
 type SelectedAction =
@@ -104,6 +58,7 @@ export default function Board({
     tiles: [],
     indexes: [],
   });
+  const [isReservedDuration, setIsReservedDuration] = useState(false);
 
   let tileClickCallback: TileClickCallback | undefined;
   switch (pendingAction) {
@@ -129,6 +84,19 @@ export default function Board({
   }, [pendingAction, selected, dispatchAction]);
 
   useEffect(() => {
+    const { last_action_time, reserved_duration } = round;
+    const delayBeforeDrawing =
+      last_action_time + reserved_duration - Date.now();
+    if (delayBeforeDrawing > 0) {
+      setIsReservedDuration(true);
+      const timer = setTimeout(() => {
+        setIsReservedDuration(false);
+      }, delayBeforeDrawing);
+      return () => window.clearTimeout(timer);
+    }
+  }, [round]);
+
+  useEffect(() => {
     setPendingAction(null);
     dispatchSelected({ type: "reset" });
   }, [nonce]);
@@ -152,13 +120,17 @@ export default function Board({
       <div className="controls">
         <Controls
           round={round}
+          isReservedDuration={isReservedDuration}
           pendingAction={pendingAction}
           setPendingAction={setPendingAction}
-          actions={allowedActions(round)}
           dispatchAction={dispatchAction}
         />
         <Messages players={players} events={events} />
-        <Status players={players} round={round} />
+        <Status
+          players={players}
+          round={round}
+          isReservedDuration={isReservedDuration}
+        />
       </div>
     </div>
   );

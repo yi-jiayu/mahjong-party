@@ -1,60 +1,123 @@
 import React, { FunctionComponent } from "react";
-import { ActionCallback, ActionType, Phase, Round } from "../mahjong";
+import { ActionCallback, ActionType, MeldType, Phase, Round } from "../mahjong";
+
+function allowedActions(round: Round): Set<ActionType> {
+  const { seat, turn, phase, discards, hands, draws_left } = round;
+  const previousTurn = (turn + 3) % 4;
+  const lastDiscard = discards.length > 0 && discards[discards.length - 1];
+  const canDraw = turn === seat && phase === Phase.Draw;
+  const canDiscard = turn === seat && phase === Phase.Discard;
+  const canPong =
+    seat !== previousTurn &&
+    phase === Phase.Draw &&
+    lastDiscard &&
+    hands[seat].concealed[lastDiscard] > 1;
+  const canGangFromDiscard =
+    seat !== previousTurn &&
+    phase === Phase.Draw &&
+    lastDiscard &&
+    hands[seat].concealed[lastDiscard] > 2;
+  const canGangFromHand =
+    canDiscard &&
+    Object.entries(hands[seat].concealed).some(([_, count]) => count > 3);
+  const canUpgradePongToGang =
+    canDiscard &&
+    hands[seat].revealed
+      .filter(({ type }) => type === MeldType.Pong)
+      .map(({ tiles: [tile] }) => tile)
+      .some((tile) => hands[seat].concealed[tile] > 0);
+  const canGang = canGangFromDiscard || canGangFromHand || canUpgradePongToGang;
+  const canHuFromDiscard =
+    seat !== previousTurn && phase === Phase.Draw && lastDiscard;
+  const canHu = canDiscard || canHuFromDiscard;
+  const canEnd = canDiscard && draws_left <= 0;
+
+  const actions = new Set<ActionType>();
+  canDraw && actions.add(ActionType.Draw);
+  canDiscard && actions.add(ActionType.Discard);
+  canPong && actions.add(ActionType.Pong);
+  canGang && actions.add(ActionType.Gang);
+  canHu && actions.add(ActionType.Hu);
+  canEnd && actions.add(ActionType.EndRound);
+  return actions;
+}
 
 const Controls: FunctionComponent<{
   round: Round;
+  isReservedDuration: boolean;
   pendingAction: ActionType | null;
   setPendingAction: React.Dispatch<React.SetStateAction<ActionType | null>>;
-  actions: Set<ActionType>;
   dispatchAction: ActionCallback;
-}> = ({ round, pendingAction, setPendingAction, actions, dispatchAction }) => {
+}> = ({
+  round,
+  isReservedDuration,
+  pendingAction,
+  setPendingAction,
+  dispatchAction,
+}) => {
   if (round.phase === Phase.Finished) {
     return (
       <div>
-        <button type="button" onClick={() => dispatchAction(ActionType.NextRound)}>
+        <button
+          type="button"
+          onClick={() => dispatchAction(ActionType.NextRound)}>
           Next round
         </button>
       </div>
     );
   }
   if (pendingAction === null) {
+    const actions = allowedActions(round);
     return (
       <div>
+        {actions.has(ActionType.EndRound) ? (
+          <button
+            type="button"
+            onClick={() => dispatchAction(ActionType.EndRound)}>
+            End round
+          </button>
+        ) : (
+          <>
+            <button
+              type="button"
+              disabled={!actions.has(ActionType.Draw) || isReservedDuration}
+              onClick={() => dispatchAction(ActionType.Draw)}>
+              Draw
+            </button>
+            <button
+              type="button"
+              disabled={!actions.has(ActionType.Discard)}
+              onClick={() => setPendingAction(ActionType.Discard)}>
+              Discard
+            </button>
+            <button
+              type="button"
+              disabled={!actions.has(ActionType.Draw) || isReservedDuration}
+              onClick={() => setPendingAction(ActionType.Chi)}>
+              Chi
+            </button>
+            <button
+              type="button"
+              disabled={!actions.has(ActionType.Pong)}
+              onClick={() => dispatchAction(ActionType.Pong)}>
+              Pong
+            </button>
+            <button
+              type="button"
+              disabled={!actions.has(ActionType.Gang)}
+              onClick={
+                round.phase === Phase.Discard
+                  ? () => setPendingAction(ActionType.Gang)
+                  : () => dispatchAction(ActionType.Gang)
+              }>
+              Gang
+            </button>
+          </>
+        )}
         <button
           type="button"
-          disabled={!actions.has(ActionType.Draw)}
-          onClick={() => dispatchAction(ActionType.Draw)}>
-          Draw
-        </button>
-        <button
-          type="button"
-          disabled={!actions.has(ActionType.Discard)}
-          onClick={() => setPendingAction(ActionType.Discard)}>
-          Discard
-        </button>
-        <button
-          type="button"
-          disabled={!actions.has(ActionType.Draw)}
-          onClick={() => setPendingAction(ActionType.Chi)}>
-          Chi
-        </button>
-        <button
-          type="button"
-          disabled={!actions.has(ActionType.Pong)}
-          onClick={() => dispatchAction(ActionType.Pong)}>
-          Pong
-        </button>
-        <button
-          type="button"
-          disabled={!actions.has(ActionType.Gang)}
-          onClick={
-            round.phase === Phase.Discard
-              ? () => setPendingAction(ActionType.Gang)
-              : () => dispatchAction(ActionType.Gang)
-          }>
-          Gang
-        </button>
-        <button type="button" onClick={() => dispatchAction(ActionType.Hu)}>
+          disabled={!actions.has(ActionType.Hu)}
+          onClick={() => dispatchAction(ActionType.Hu)}>
           Hu
         </button>
       </div>
