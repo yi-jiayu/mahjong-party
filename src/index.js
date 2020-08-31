@@ -11,6 +11,7 @@ Sentry.init({
   integrations: [new Integrations.BrowserTracing()],
   tracesSampleRate: 1.0,
   environment: process.env.REACT_APP_SENTRY_ENVIRONMENT,
+  release: process.env.REACT_APP_VERSION,
 });
 
 ReactDOM.render(
