@@ -1,5 +1,5 @@
 import React, { useEffect, useReducer, useState } from "react";
-import { ActionCallback, ActionType, Player, Round } from "../mahjong";
+import { ActionCallback, ActionType, Player, Round, TileBag } from "../mahjong";
 
 import "./board.css";
 import "./tiles.css";
@@ -15,6 +15,7 @@ import Hands from "./Hands";
 import Status from "./Status";
 import Info from "./Info";
 import Discards from "./Discards";
+import produce from "immer";
 
 type SelectedState = { tiles: string[]; indexes: number[] };
 type SelectedAction =
@@ -40,6 +41,33 @@ const reduceSelected = (
   }
 };
 
+type TilesAction =
+  | { type: "update"; tiles: TileBag }
+  | { type: "remove"; index: number };
+
+const reduceTiles = (state: string[], action: TilesAction) => {
+  switch (action.type) {
+    case "update":
+      const remaining = { ...action.tiles };
+      state = state.reduce((tiles, tile) => {
+        if (remaining[tile] > 0) {
+          remaining[tile]--;
+          return [...tiles, tile];
+        }
+        return tiles;
+      }, [] as string[]);
+      return state.concat(
+        Object.entries(remaining).flatMap(([tile, count]) =>
+          new Array(count).fill(tile)
+        )
+      );
+    case "remove":
+      return produce(state, (draft) => {
+        draft.splice(action.index, 1);
+      });
+  }
+};
+
 export default function Board({
   nonce,
   players,
@@ -51,7 +79,16 @@ export default function Board({
   round: Round;
   dispatchAction: ActionCallback;
 }) {
-  const { seat, hands, discards, events, scores } = round;
+  const {
+    seat,
+    hands,
+    discards,
+    events,
+    scores,
+    last_action_time,
+    reserved_duration,
+  } = round;
+  const concealed = hands[seat].concealed;
 
   const [pendingAction, setPendingAction] = useState<ActionType | null>(null);
   const [selected, dispatchSelected] = useReducer(reduceSelected, {
@@ -59,6 +96,10 @@ export default function Board({
     indexes: [],
   });
   const [isReservedDuration, setIsReservedDuration] = useState(false);
+  const [tiles, dispatchTiles] = useReducer(
+    reduceTiles,
+    reduceTiles([], { type: "update", tiles: concealed })
+  );
 
   let tileClickCallback: TileClickCallback | undefined;
   switch (pendingAction) {
@@ -84,7 +125,6 @@ export default function Board({
   }, [pendingAction, selected, dispatchAction]);
 
   useEffect(() => {
-    const { last_action_time, reserved_duration } = round;
     const delayBeforeDrawing =
       last_action_time + reserved_duration - Date.now();
     if (delayBeforeDrawing > 0) {
@@ -94,12 +134,16 @@ export default function Board({
       }, delayBeforeDrawing);
       return () => window.clearTimeout(timer);
     }
-  }, [round]);
+  }, [last_action_time, reserved_duration]);
 
   useEffect(() => {
     setPendingAction(null);
     dispatchSelected({ type: "reset" });
   }, [nonce]);
+
+  useEffect(() => {
+    dispatchTiles({ type: "update", tiles: concealed });
+  }, [concealed]);
 
   return (
     <div className="table">
@@ -109,7 +153,7 @@ export default function Board({
         <Tiles tiles={hands[seat].flowers} />
         <Melds melds={hands[seat].revealed} />
         <OrderedRack
-          tiles={hands[seat].concealed}
+          tiles={tiles}
           selecting={pendingAction === ActionType.Chi}
           selected={selected.indexes}
           onTileClick={tileClickCallback}
