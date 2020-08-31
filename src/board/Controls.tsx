@@ -1,5 +1,12 @@
 import React, { FunctionComponent } from "react";
-import { ActionCallback, ActionType, MeldType, Phase, Round } from "../mahjong";
+import {
+  ActionCallback,
+  ActionType,
+  MeldType,
+  Phase,
+  Round,
+  sequences,
+} from "../mahjong";
 import { TilesAction } from "./types";
 
 function allowedActions(round: Round): Set<ActionType> {
@@ -8,6 +15,13 @@ function allowedActions(round: Round): Set<ActionType> {
   const lastDiscard = discards.length > 0 && discards[discards.length - 1];
   const canDraw = turn === seat && phase === Phase.Draw;
   const canDiscard = turn === seat && phase === Phase.Discard;
+  const canChi =
+    canDraw &&
+    lastDiscard &&
+    sequences.hasOwnProperty(lastDiscard) &&
+    sequences[lastDiscard].some((seq) =>
+      seq.every((tile) => hands[seat].concealed.hasOwnProperty(tile))
+    );
   const canPong =
     seat !== previousTurn &&
     phase === Phase.Draw &&
@@ -35,6 +49,7 @@ function allowedActions(round: Round): Set<ActionType> {
 
   const actions = new Set<ActionType>();
   canDraw && actions.add(ActionType.Draw);
+  canChi && actions.add(ActionType.Chi);
   canDiscard && actions.add(ActionType.Discard);
   canPong && actions.add(ActionType.Pong);
   canGang && actions.add(ActionType.Gang);
@@ -73,9 +88,6 @@ const Controls: FunctionComponent<{
     const actions = allowedActions(round);
     return (
       <div>
-        <button type="button" onClick={() => dispatchTiles({ type: "sort" })}>
-          Sort tiles
-        </button>
         {actions.has(ActionType.EndRound) ? (
           <button
             type="button"
@@ -98,7 +110,7 @@ const Controls: FunctionComponent<{
             </button>
             <button
               type="button"
-              disabled={!actions.has(ActionType.Draw) || isReservedDuration}
+              disabled={!actions.has(ActionType.Chi) || isReservedDuration}
               onClick={() => setPendingAction(ActionType.Chi)}>
               Chi
             </button>
@@ -125,6 +137,9 @@ const Controls: FunctionComponent<{
           disabled={!actions.has(ActionType.Hu)}
           onClick={() => dispatchAction(ActionType.Hu)}>
           Hu
+        </button>
+        <button type="button" onClick={() => dispatchTiles({ type: "sort" })}>
+          Sort tiles
         </button>
       </div>
     );
