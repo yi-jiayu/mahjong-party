@@ -160,7 +160,7 @@ export default function Room() {
             nonce={room.nonce}
             players={room.players}
             round={room.round}
-            dispatch={dispatch}
+            dispatchAction={dispatch}
           />
         );
       }

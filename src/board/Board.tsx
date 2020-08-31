@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import {
   ActionCallback,
   ActionType,
@@ -62,51 +62,75 @@ function allowedActions(round: Round): Set<ActionType> {
   return actions;
 }
 
+type SelectedState = { tiles: string[]; indexes: number[] };
+type SelectedAction =
+  | { type: "reset" }
+  | { type: "click"; tile: string; index: number };
+
+const reduceSelected = (
+  selected: SelectedState,
+  action: SelectedAction
+): SelectedState => {
+  if (
+    action.type === "reset" ||
+    (selected.indexes.length === 1 && selected.indexes[0] === action.index)
+  ) {
+    return { tiles: [], indexes: [] };
+  } else if (selected.indexes.length === 0) {
+    return { tiles: [action.tile], indexes: [action.index] };
+  } else {
+    return {
+      tiles: [...selected.tiles, action.tile],
+      indexes: [...selected.indexes, action.index],
+    };
+  }
+};
+
 export default function Board({
   nonce,
   players,
   round,
-  dispatch,
+  dispatchAction,
 }: {
   nonce: number;
   players: Player[];
   round: Round;
-  dispatch: ActionCallback;
+  dispatchAction: ActionCallback;
 }) {
   const { seat, hands, discards, events, scores } = round;
 
   const [pendingAction, setPendingAction] = useState<ActionType | null>(null);
-  const [selected, setSelected] = useState<{ tile: string; index: number }>({
-    tile: "",
-    index: -1,
+  const [selected, dispatchSelected] = useReducer(reduceSelected, {
+    tiles: [],
+    indexes: [],
   });
 
   let tileClickCallback: TileClickCallback | undefined;
   switch (pendingAction) {
     case ActionType.Discard:
-      tileClickCallback = (tile) => () => dispatch(ActionType.Discard, [tile]);
+      tileClickCallback = (tile) => () =>
+        dispatchAction(ActionType.Discard, [tile]);
       break;
     case ActionType.Chi:
-      tileClickCallback = (tile, index) => () => {
-        const { index: selectedIndex, tile: selectedTile } = selected;
-        if (selectedIndex === index) {
-          setSelected({ tile: "", index: -1 });
-        } else if (selectedIndex === -1) {
-          setSelected({ index, tile });
-        } else {
-          setSelected({ tile: "", index: -1 });
-          dispatch(ActionType.Chi, [selectedTile, tile]);
-        }
-      };
+      tileClickCallback = (tile, index) => () =>
+        dispatchSelected({ type: "click", tile, index });
       break;
     case ActionType.Gang:
-      tileClickCallback = (tile) => () => dispatch(ActionType.Gang, [tile]);
+      tileClickCallback = (tile) => () =>
+        dispatchAction(ActionType.Gang, [tile]);
       break;
   }
 
   useEffect(() => {
+    if (pendingAction === ActionType.Chi && selected.tiles.length === 2) {
+      dispatchAction(ActionType.Chi, selected.tiles);
+      dispatchSelected({ type: "reset" });
+    }
+  }, [pendingAction, selected, dispatchAction]);
+
+  useEffect(() => {
     setPendingAction(null);
-    setSelected({ tile: "", index: -1 });
+    dispatchSelected({ type: "reset" });
   }, [nonce]);
 
   return (
@@ -119,7 +143,7 @@ export default function Board({
         <OrderedRack
           tiles={hands[seat].concealed}
           selecting={pendingAction === ActionType.Chi}
-          selected={selected.index}
+          selected={selected.indexes}
           onTileClick={tileClickCallback}
         />
       </div>
@@ -131,7 +155,7 @@ export default function Board({
           pendingAction={pendingAction}
           setPendingAction={setPendingAction}
           actions={allowedActions(round)}
-          dispatch={dispatch}
+          dispatchAction={dispatchAction}
         />
         <Messages players={players} events={events} />
         <Status players={players} round={round} />

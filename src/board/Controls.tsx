@@ -6,12 +6,12 @@ const Controls: FunctionComponent<{
   pendingAction: ActionType | null;
   setPendingAction: React.Dispatch<React.SetStateAction<ActionType | null>>;
   actions: Set<ActionType>;
-  dispatch: ActionCallback;
-}> = ({ round, pendingAction, setPendingAction, actions, dispatch }) => {
+  dispatchAction: ActionCallback;
+}> = ({ round, pendingAction, setPendingAction, actions, dispatchAction }) => {
   if (round.phase === Phase.Finished) {
     return (
       <div>
-        <button type="button" onClick={() => dispatch(ActionType.NextRound)}>
+        <button type="button" onClick={() => dispatchAction(ActionType.NextRound)}>
           Next round
         </button>
       </div>
@@ -23,7 +23,7 @@ const Controls: FunctionComponent<{
         <button
           type="button"
           disabled={!actions.has(ActionType.Draw)}
-          onClick={() => dispatch(ActionType.Draw)}>
+          onClick={() => dispatchAction(ActionType.Draw)}>
           Draw
         </button>
         <button
@@ -41,7 +41,7 @@ const Controls: FunctionComponent<{
         <button
           type="button"
           disabled={!actions.has(ActionType.Pong)}
-          onClick={() => dispatch(ActionType.Pong)}>
+          onClick={() => dispatchAction(ActionType.Pong)}>
           Pong
         </button>
         <button
@@ -50,11 +50,11 @@ const Controls: FunctionComponent<{
           onClick={
             round.phase === Phase.Discard
               ? () => setPendingAction(ActionType.Gang)
-              : () => dispatch(ActionType.Gang)
+              : () => dispatchAction(ActionType.Gang)
           }>
           Gang
         </button>
-        <button type="button" onClick={() => dispatch(ActionType.Hu)}>
+        <button type="button" onClick={() => dispatchAction(ActionType.Hu)}>
           Hu
         </button>
       </div>

@@ -12,7 +12,7 @@ export default function OrderedRack({
 }: {
   tiles: TileBag;
   selecting?: boolean;
-  selected?: number;
+  selected?: number[];
   onTileClick?: TileClickCallback;
 }) {
   const [order, setOrder] = useState<string[]>(
@@ -47,7 +47,7 @@ export default function OrderedRack({
     <Tile
       tile={tile}
       key={tile + index}
-      selected={selected === index}
+      selected={selected?.includes(index)}
       onClick={onTileClick ? onTileClick(tile, index) : undefined}
     />
   ));
