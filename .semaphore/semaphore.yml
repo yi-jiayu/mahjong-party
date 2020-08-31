@@ -23,3 +23,8 @@ blocks:
       secrets:
         - name: github@mahjong SSH key
         - name: Mahjong Party GA Tracking ID
+      env_vars:
+        - name: REACT_APP_SENTRY_DSN
+          value: 'https://e9237c7918ba47c299f383dff65e7857@o220526.ingest.sentry.io/5412038'
+        - name: REACT_APP_SENTRY_ENVIRONMENT
+          value: production
