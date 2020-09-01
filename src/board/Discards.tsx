@@ -6,16 +6,16 @@ import { DraggedTile } from "./types";
 const Discards: FunctionComponent<{
   discards: string[];
   canDiscard: boolean;
-  discardTile: (tile: string) => void;
+  discardTile: (tile: string, index: number) => void;
 }> = ({ discards, canDiscard, discardTile }) => {
   const [{ isOver }, drop] = useDrop({
     accept: "tile",
     collect: (monitor) => ({
       isOver: monitor.isOver(),
     }),
-    drop: ({ tile }: DraggedTile) => {
+    drop: ({ tile, index }: DraggedTile) => {
       if (canDiscard) {
-        discardTile(tile);
+        discardTile(tile, index);
       }
     },
   });

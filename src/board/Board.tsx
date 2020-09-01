@@ -115,11 +115,15 @@ const Board: FunctionComponent<{
     reduceTiles([], { type: "update", tiles: concealed })
   );
 
+  const discardTile = (tile: string, index: number) => {
+    dispatchTiles({ type: "remove", index });
+    dispatchAction(ActionType.Discard, [tile]);
+  };
+
   let tileClickCallback: TileClickCallback | undefined;
   switch (pendingAction) {
     case ActionType.Discard:
-      tileClickCallback = (tile) => () =>
-        dispatchAction(ActionType.Discard, [tile]);
+      tileClickCallback = (tile, index) => () => discardTile(tile, index);
       break;
     case ActionType.Chi:
       tileClickCallback = (tile, index) => () =>
@@ -190,7 +194,7 @@ const Board: FunctionComponent<{
         <Discards
           discards={discards}
           canDiscard={turn === seat && phase === Phase.Discard}
-          discardTile={(tile) => dispatchAction(ActionType.Discard, [tile])}
+          discardTile={discardTile}
         />
         <div className="underneath">
           <Controls
