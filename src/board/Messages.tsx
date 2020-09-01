@@ -1,11 +1,18 @@
-import React, { FunctionComponent } from "react";
+import React, {
+  CSSProperties,
+  FunctionComponent,
+  useEffect,
+  useRef,
+} from "react";
 import { Event, EventType, Player } from "../mahjong";
 import Tile from "./Tile";
+import { FixedSizeList } from "react-window";
 
 const Message: FunctionComponent<{
   players: Player[];
   event: Event;
-}> = ({ players, event }) => {
+  style: CSSProperties;
+}> = ({ players, event, style }) => {
   const timestamp = new Date(event.time);
   let tiles = event.tiles || [];
   let name = players[event.seat].name;
@@ -37,8 +44,10 @@ const Message: FunctionComponent<{
       break;
   }
   return (
-    <div className="message">
-      <span>{timestamp.toLocaleTimeString()}</span> {message}
+    <div style={style} className="message">
+      <span style={{ marginRight: "8px" }}>
+        {timestamp.toLocaleTimeString()} {message}
+      </span>
       {tiles.map((tile, index) => (
         <Tile tile={tile} inline={true} key={index} />
       ))}
@@ -50,14 +59,26 @@ const Messages: FunctionComponent<{
   players: Player[];
   events: Event[];
 }> = ({ players, events }) => {
+  const ref = useRef<FixedSizeList>(null);
+
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.scrollToItem(events.length - 1);
+    }
+  });
+
   return (
-    <div className="messages">
-      {events
-        .map((event, index) => (
-          <Message players={players} event={event} key={index} />
-        ))
-        .reverse()}
-    </div>
+    <FixedSizeList
+      ref={ref}
+      itemSize={32}
+      height={160}
+      itemCount={events.length}
+      width={"100%"}
+      className="messages">
+      {({ index, style }) => (
+        <Message players={players} event={events[index]} style={style} />
+      )}
+    </FixedSizeList>
   );
 };
 

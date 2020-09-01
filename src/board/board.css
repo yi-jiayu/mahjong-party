@@ -115,10 +115,7 @@
 }
 
 .messages {
-  display: flex;
-  flex-direction: column-reverse;
-  overflow-y: scroll;
-  height: 5em;
+  margin-top: 4px;
 }
 
 .tile {
@@ -130,9 +127,14 @@
   background-image: url("tiles/back.svg");
 }
 
+.message {
+  display: flex;
+  align-items: center;
+}
+
 .tile.inline {
-  height: 1em;
-  width: 0.8125em;
+  height: 32px;
+  width: 26px;
   display: inline-block;
 }
 

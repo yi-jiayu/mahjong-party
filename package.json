@@ -14,6 +14,7 @@
     "@types/react-dom": "^16.9.8",
     "@types/react-helmet": "^6.1.0",
     "@types/react-router-dom": "^5.1.5",
+    "@types/react-window": "^1.8.2",
     "@types/reactour": "^1.17.1",
     "@types/styled-components": "^5.1.2",
     "csshake": "^1.5.3",
@@ -26,6 +27,7 @@
     "react-helmet": "^6.1.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
+    "react-window": "^1.8.5",
     "reactour": "^1.18.0",
     "styled-components": "4.0.0",
     "typescript": "^4.0.2"
