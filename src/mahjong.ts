@@ -21,7 +21,6 @@ export enum MeldType {
 export enum Phase {
   Draw = "draw",
   Discard = "discard",
-  Finished = "finished",
 }
 
 export interface Meld {
@@ -33,6 +32,7 @@ export interface Hand {
   flowers: string[];
   revealed: Meld[];
   concealed: TileBag;
+  finished: string[] | undefined;
 }
 
 export type TileBag = Record<string, number>;
@@ -74,6 +74,21 @@ export interface Event {
   tiles: string[];
 }
 
+export enum Direction {
+  East,
+  South,
+  West,
+  North,
+}
+
+export interface Result {
+  dealer: number;
+  wind: Direction;
+  winner: number;
+  points: number;
+  winning_tiles: string[];
+}
+
 export interface Round {
   draws_left: number;
   scores: number[];
@@ -87,6 +102,8 @@ export interface Round {
   discards: string[];
   last_action_time: number;
   reserved_duration: number;
+  finished: boolean;
+  result: Result | undefined;
 }
 
 // noinspection NonAsciiCharacters

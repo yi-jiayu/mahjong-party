@@ -1,5 +1,6 @@
 import React, {
   FunctionComponent,
+  ReactElement,
   useEffect,
   useReducer,
   useState,
@@ -93,6 +94,7 @@ const Board: FunctionComponent<{
 }> = ({ nonce, players, round, dispatchAction, children }) => {
   const {
     seat,
+    dealer,
     hands,
     discards,
     turn,
@@ -163,32 +165,38 @@ const Board: FunctionComponent<{
     dispatchTiles({ type: "update", tiles: concealed });
   }, [concealed]);
 
+  let ownTiles: ReactElement;
+  const finished = hands[seat].finished;
+  if (finished !== undefined) {
+    ownTiles = <Tiles tiles={finished} />;
+  } else if (pendingAction === null) {
+    ownTiles = (
+      <SortableRack
+        tiles={tiles}
+        moveTile={(from, to) => dispatchTiles({ type: "move", from, to })}
+      />
+    );
+  } else {
+    ownTiles = (
+      <SelectableRack
+        tiles={tiles}
+        selecting={pendingAction === ActionType.Chi}
+        selected={selected.indexes}
+        onTileClick={tileClickCallback}
+      />
+    );
+  }
+
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="table">
         {children}
         <Info players={players} round={round} />
-        <Labels players={players} seat={seat} scores={scores} />
+        <Labels players={players} dealer={dealer} seat={seat} scores={scores} />
         <div className="bottom">
           <Tiles tiles={hands[seat].flowers} />
           <Melds melds={hands[seat].revealed} />
-          <div className="tutorial-your_tiles">
-            {pendingAction === null ? (
-              <SortableRack
-                tiles={tiles}
-                moveTile={(from, to) =>
-                  dispatchTiles({ type: "move", from, to })
-                }
-              />
-            ) : (
-              <SelectableRack
-                tiles={tiles}
-                selecting={pendingAction === ActionType.Chi}
-                selected={selected.indexes}
-                onTileClick={tileClickCallback}
-              />
-            )}
-          </div>
+          <div className="tutorial-your_tiles">{ownTiles}</div>
         </div>
         <Hands round={round} />
         <Discards

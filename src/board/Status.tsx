@@ -10,21 +10,26 @@ const Status: FunctionComponent<{
   const name = seat === turn ? "you" : players[turn].name;
   let timestamp = new Date(last_action_time);
   let message: string;
-  switch (phase) {
-    case Phase.Draw:
-      if (isReservedDuration) {
-        message = `Giving everyone a chance to react...`;
-      } else {
-        timestamp = new Date(last_action_time + reserved_duration);
-        message = `Waiting for ${name} to draw...`;
-      }
-      break;
-    case Phase.Discard:
-      message = `Waiting for ${name} to discard...`;
-      break;
-    case Phase.Finished:
+  if (round.finished) {
+    if (phase === Phase.Draw && isReservedDuration) {
+      message = "Waiting to see if anyone else can hu...";
+    } else {
       message = "Waiting for next round to begin...";
-      break;
+    }
+  } else {
+    switch (phase) {
+      case Phase.Draw:
+        if (isReservedDuration) {
+          message = `Giving everyone a chance to react...`;
+        } else {
+          timestamp = new Date(last_action_time + reserved_duration);
+          message = `Waiting for ${name} to draw...`;
+        }
+        break;
+      case Phase.Discard:
+        message = `Waiting for ${name} to discard...`;
+        break;
+    }
   }
   return (
     <div>

@@ -42,7 +42,9 @@ function allowedActions(round: Round): Set<ActionType> {
       .some((tile) => hands[seat].concealed[tile] > 0);
   const canGang = canGangFromDiscard || canGangFromHand || canUpgradePongToGang;
   const canHuFromDiscard =
-    seat !== previousTurn && phase === Phase.Draw && lastDiscard;
+    seat !== previousTurn &&
+    phase === Phase.Draw &&
+    (lastDiscard || round.finished);
   const canHu = canDiscard || canHuFromDiscard;
   const canEnd = canDiscard && draws_left <= 0;
 
@@ -74,7 +76,7 @@ const Controls: FunctionComponent<{
   sortTiles,
   dispatchAction,
 }) => {
-  if (round.phase === Phase.Finished) {
+  if (round.finished && !isReservedDuration) {
     return (
       <div>
         <button

@@ -1,8 +1,16 @@
 import React, { FunctionComponent } from "react";
-import { Round } from "../mahjong";
+import { Hand, Round } from "../mahjong";
 import Tiles from "./Tiles";
 import Melds from "./Melds";
 import Rack from "./Rack";
+
+function concealedOrFinished(hand: Hand) {
+  if (hand.finished !== undefined) {
+    return <Tiles tiles={hand.finished} />;
+  } else {
+    return <Rack tiles={hand.concealed} />;
+  }
+}
 
 const Hands: FunctionComponent<{
   round: Round;
@@ -14,17 +22,17 @@ const Hands: FunctionComponent<{
         <div className="hand-right">
           <Tiles tiles={hands[(seat + 1) % 4].flowers} />
           <Melds melds={hands[(seat + 1) % 4].revealed} />
-          <Rack tiles={hands[(seat + 1) % 4].concealed} />
+          {concealedOrFinished(hands[(seat + 1) % 4])}
         </div>
       </div>
       <div className="top">
-        <Rack tiles={hands[(seat + 2) % 4].concealed} />
+        {concealedOrFinished(hands[(seat + 2) % 4])}
         <Melds melds={hands[(seat + 2) % 4].revealed} />
         <Tiles tiles={hands[(seat + 2) % 4].flowers} />
       </div>
       <div className="left">
         <div className="hand-left">
-          <Rack tiles={hands[(seat + 3) % 4].concealed} />
+          {concealedOrFinished(hands[(seat + 3) % 4])}
           <Melds melds={hands[(seat + 3) % 4].revealed} />
           <Tiles tiles={hands[(seat + 3) % 4].flowers} />
         </div>

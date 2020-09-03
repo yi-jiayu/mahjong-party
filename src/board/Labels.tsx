@@ -3,35 +3,67 @@ import { Player } from "../mahjong";
 
 type LabelProps = {
   seat: number;
+  dealer: number;
   players: Player[];
   scores: number[];
 };
 
-const Label: FunctionComponent<LabelProps> = ({ seat, players, scores }) => {
+const Label: FunctionComponent<{
+  isDealer: boolean;
+  name: string;
+  score: number;
+}> = ({ isDealer, name, score }) => {
   return (
     <div>
-      {seat === 0 && "★ "}
-      {players[seat].name}
+      {isDealer && "★ "}
+      {name}
       {": "}
-      <span className="score">{20000 + scores[seat] * 100}</span>
+      <span className="score">{20000 + score * 100}</span>
     </div>
   );
 };
 
-const Labels: FunctionComponent<LabelProps> = ({ seat, players, scores }) => {
+const Labels: FunctionComponent<LabelProps> = ({
+  seat,
+  dealer,
+  players,
+  scores,
+}) => {
+  const [bottom, right, top, left] = [
+    seat,
+    (seat + 1) % 4,
+    (seat + 2) % 4,
+    (seat + 3) % 4,
+  ];
   return (
     <>
       <div className="label-bottom">
-        <Label seat={seat} scores={scores} players={players} />
+        <Label
+          isDealer={bottom === dealer}
+          name={players[bottom].name}
+          score={scores[bottom]}
+        />
       </div>
       <div className="label-right">
-        <Label seat={(seat + 1) % 4} scores={scores} players={players} />
+        <Label
+          isDealer={right === dealer}
+          name={players[right].name}
+          score={scores[right]}
+        />
       </div>
       <div className="label-top">
-        <Label seat={(seat + 2) % 4} scores={scores} players={players} />
+        <Label
+          isDealer={top === dealer}
+          name={players[top].name}
+          score={scores[top]}
+        />
       </div>
       <div className="label-left">
-        <Label seat={(seat + 3) % 4} scores={scores} players={players} />
+        <Label
+          isDealer={left === dealer}
+          name={players[left].name}
+          score={scores[left]}
+        />
       </div>
     </>
   );
