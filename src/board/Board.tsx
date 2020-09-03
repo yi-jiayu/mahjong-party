@@ -121,6 +121,8 @@ const Board: FunctionComponent<{
     dispatchTiles({ type: "remove", index });
     dispatchAction(ActionType.Discard, [tile]);
   };
+  const discardLastTile = () =>
+    discardTile(tiles[tiles.length - 1].tile, tiles.length - 1);
 
   let tileClickCallback: TileClickCallback | undefined;
   switch (pendingAction) {
@@ -214,6 +216,7 @@ const Board: FunctionComponent<{
               ({ tile }, i) => i === 0 || tiles[i - 1].tile <= tile
             )}
             sortTiles={() => dispatchTiles({ type: "sort" })}
+            discardLastTile={discardLastTile}
             dispatchAction={dispatchAction}
           />
           <Messages players={players} events={events} />

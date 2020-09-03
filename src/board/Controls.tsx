@@ -66,6 +66,7 @@ const Controls: FunctionComponent<{
   setPendingAction: React.Dispatch<React.SetStateAction<ActionType | null>>;
   tilesAreSorted: boolean;
   sortTiles: () => void;
+  discardLastTile: () => void;
   dispatchAction: ActionCallback;
 }> = ({
   round,
@@ -74,6 +75,7 @@ const Controls: FunctionComponent<{
   setPendingAction,
   tilesAreSorted,
   sortTiles,
+  discardLastTile,
   dispatchAction,
 }) => {
   if (round.finished && !isReservedDuration) {
@@ -99,12 +101,18 @@ const Controls: FunctionComponent<{
           </button>
         ) : (
           <>
-            <button
-              type="button"
-              disabled={!actions.has(ActionType.Draw) || isReservedDuration}
-              onClick={() => dispatchAction(ActionType.Draw)}>
-              Draw
-            </button>
+            {actions.has(ActionType.Discard) ? (
+              <button type="button" onClick={() => discardLastTile()}>
+                Discard last
+              </button>
+            ) : (
+              <button
+                type="button"
+                disabled={!actions.has(ActionType.Draw) || isReservedDuration}
+                onClick={() => dispatchAction(ActionType.Draw)}>
+                Draw
+              </button>
+            )}
             <button
               type="button"
               disabled={!actions.has(ActionType.Discard)}
