@@ -53,10 +53,12 @@
 
 .infobox {
   padding: 4px 8px;
+  line-height: 1.15;
   border-radius: 1px;
   border: 2px solid #4a4a4a;
   color: #4a4a4a;
   margin-right: 8px;
+  display: inline-block;
 }
 
 .top {
