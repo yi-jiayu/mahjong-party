@@ -151,6 +151,10 @@
   opacity: 0.5;
 }
 
+.selectable .tile {
+  cursor: pointer;
+}
+
 .selecting .tile.selected {
   opacity: 1;
 }
