@@ -1,11 +1,22 @@
-export interface Room {
+export enum RoomPhase {
+  Lobby,
+  InProgress,
+  Finished,
+}
+
+export type Room = {
   id: string;
   nonce: number;
   phase: number;
   players: Player[];
-  round: Round;
   inside: boolean;
-}
+  results: Result[];
+  scores: number[];
+} & (
+  | { phase: RoomPhase.Lobby }
+  | { phase: RoomPhase.InProgress; round: Round }
+  | { phase: RoomPhase.Finished }
+);
 
 export interface Player {
   name: string;
@@ -18,7 +29,7 @@ export enum MeldType {
   Eyes,
 }
 
-export enum Phase {
+export enum RoundPhase {
   Draw = "draw",
   Discard = "discard",
 }
@@ -85,6 +96,7 @@ export interface Result {
   dealer: number;
   wind: Direction;
   winner: number;
+  loser: number;
   points: number;
   winning_tiles: string[];
 }
@@ -98,7 +110,7 @@ export interface Round {
   dealer: number;
   wind: number;
   turn: number;
-  phase: Phase;
+  phase: RoundPhase;
   discards: string[];
   last_action_time: number;
   reserved_duration: number;

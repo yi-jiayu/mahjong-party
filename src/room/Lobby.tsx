@@ -1,26 +1,7 @@
-import React, { SyntheticEvent, useEffect, useState } from "react";
-import styles from "./App.module.css";
-import { useHistory, useParams } from "react-router-dom";
-import produce from "immer";
-import NotFound from "./NotFound";
-import Board from "./board/Board";
-import { ActionType, Round } from "./mahjong";
-
-const PHASE_NOT_FOUND = -1;
-const PHASE_LOBBY = 0;
-const PHASE_IN_PROGRESS = 1;
-
-interface Player {
-  name: string;
-}
-
-interface Room {
-  inside: boolean;
-  nonce: number;
-  phase: number;
-  players: Player[];
-  round?: Round;
-}
+import React, { SyntheticEvent, useState } from "react";
+import { useHistory } from "react-router-dom";
+import styles from "../App.module.css";
+import { Room } from "../mahjong";
 
 function JoinRoom({ roomId }: { roomId: string }) {
   const [name, setName] = useState("");
@@ -49,7 +30,7 @@ function JoinRoom({ roomId }: { roomId: string }) {
   );
 }
 
-function Lobby({
+export default function Lobby({
   roomId,
   room,
   startGame,
@@ -119,70 +100,4 @@ function Lobby({
       )}
     </main>
   );
-}
-
-export default function Room() {
-  const { roomId }: { roomId: string } = useParams();
-  const [room, setRoom] = useState<Room>({
-    inside: false,
-    nonce: 0,
-    phase: PHASE_LOBBY,
-    players: [],
-  });
-
-  useEffect(() => {
-    document.title = `${roomId} | Mahjong Party`;
-    const eventSource = new EventSource(`/api/rooms/${roomId}/live`);
-    eventSource.onerror = () => {
-      if (eventSource.readyState === EventSource.CLOSED) {
-        setRoom((room) =>
-          produce(room, (draft) => {
-            draft.phase = PHASE_NOT_FOUND;
-          })
-        );
-      }
-    };
-    eventSource.onmessage = async (e) => {
-      const room = JSON.parse(e.data);
-      setRoom(room);
-    };
-    return () => eventSource.close();
-  }, [roomId]);
-
-  const dispatch = async (type: ActionType, tiles: string[] = []) => {
-    const resp = await fetch(`/api/rooms/${roomId}/actions`, {
-      method: "post",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ nonce: room.nonce, type: type, tiles: tiles }),
-    });
-    if (!resp.ok) {
-      const reason = await resp.text();
-      alert(reason);
-    }
-  };
-
-  switch (room.phase) {
-    case PHASE_LOBBY:
-      return (
-        <Lobby
-          roomId={roomId}
-          room={room}
-          startGame={() => dispatch(ActionType.NextRound)}
-        />
-      );
-    case PHASE_IN_PROGRESS:
-      if (room.round) {
-        return (
-          <Board
-            nonce={room.nonce}
-            players={room.players}
-            round={room.round}
-            dispatchAction={dispatch}
-          />
-        );
-      }
-      break;
-    case PHASE_NOT_FOUND:
-      return <NotFound />;
-  }
 }

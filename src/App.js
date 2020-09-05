@@ -8,9 +8,9 @@ import {
 
 import "./App.css";
 import Home from "./Home";
-import Room from "./Room";
 import NotFound from "./NotFound";
 import Tutorial from "./Tutorial";
+import Subscription from "./room/Subscription";
 
 function App() {
   return (
@@ -48,9 +48,14 @@ function Rooms() {
   let match = useRouteMatch();
 
   return (
-    <Route path={`${match.path}/:roomId`}>
-      <Room />
-    </Route>
+    <Switch>
+      <Route exact path={`${match.path}/`}>
+        <NotFound />
+      </Route>
+      <Route path={`${match.path}/:roomId`}>
+        <Subscription />
+      </Route>
+    </Switch>
   );
 }
 

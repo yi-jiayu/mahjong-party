@@ -23,6 +23,9 @@ export default function SelectableRack({
     />
   ));
   return (
-    <div className={selecting ? "rack selecting" : "rack"}>{elements}</div>
+    <div
+      className={selecting ? "rack selectable selecting" : "rack selectable"}>
+      {elements}
+    </div>
   );
 }

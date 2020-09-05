@@ -3,17 +3,20 @@ import {
   ActionCallback,
   ActionType,
   MeldType,
-  Phase,
   Round,
+  RoundPhase,
   sequences,
 } from "../mahjong";
 
 function allowedActions(round: Round): Set<ActionType> {
-  const { seat, turn, phase, discards, hands, draws_left } = round;
+  const { seat, turn, phase, discards, hands, draws_left, finished } = round;
+  if (finished) {
+    return new Set();
+  }
   const previousTurn = (turn + 3) % 4;
   const lastDiscard = discards.length > 0 && discards[discards.length - 1];
-  const canDraw = turn === seat && phase === Phase.Draw;
-  const canDiscard = turn === seat && phase === Phase.Discard;
+  const canDraw = turn === seat && phase === RoundPhase.Draw;
+  const canDiscard = turn === seat && phase === RoundPhase.Discard;
   const canChi =
     canDraw &&
     lastDiscard &&
@@ -23,12 +26,12 @@ function allowedActions(round: Round): Set<ActionType> {
     );
   const canPong =
     seat !== previousTurn &&
-    phase === Phase.Draw &&
+    phase === RoundPhase.Draw &&
     lastDiscard &&
     hands[seat].concealed[lastDiscard] > 1;
   const canGangFromDiscard =
     seat !== previousTurn &&
-    phase === Phase.Draw &&
+    phase === RoundPhase.Draw &&
     lastDiscard &&
     hands[seat].concealed[lastDiscard] > 2;
   const canGangFromHand =
@@ -43,7 +46,7 @@ function allowedActions(round: Round): Set<ActionType> {
   const canGang = canGangFromDiscard || canGangFromHand || canUpgradePongToGang;
   const canHuFromDiscard =
     seat !== previousTurn &&
-    phase === Phase.Draw &&
+    phase === RoundPhase.Draw &&
     (lastDiscard || round.finished);
   const canHu = canDiscard || canHuFromDiscard;
   const canEnd = canDiscard && draws_left <= 0;
@@ -78,7 +81,10 @@ const Controls: FunctionComponent<{
   discardLastTile,
   dispatchAction,
 }) => {
-  if (round.finished && !isReservedDuration) {
+  if (
+    round.finished &&
+    !(round.phase === RoundPhase.Draw && isReservedDuration)
+  ) {
     return (
       <div>
         <button
@@ -135,7 +141,7 @@ const Controls: FunctionComponent<{
               type="button"
               disabled={!actions.has(ActionType.Gang)}
               onClick={
-                round.phase === Phase.Discard
+                round.phase === RoundPhase.Discard
                   ? () => setPendingAction(ActionType.Gang)
                   : () => dispatchAction(ActionType.Gang)
               }>

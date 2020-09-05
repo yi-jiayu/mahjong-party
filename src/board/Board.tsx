@@ -5,7 +5,7 @@ import React, {
   useReducer,
   useState,
 } from "react";
-import { ActionCallback, ActionType, Phase, Player, Round } from "../mahjong";
+import { ActionCallback, ActionType, RoundPhase, Player, Round } from "../mahjong";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
@@ -203,7 +203,7 @@ const Board: FunctionComponent<{
         <Hands round={round} />
         <Discards
           discards={discards}
-          canDiscard={turn === seat && phase === Phase.Discard}
+          canDiscard={turn === seat && phase === RoundPhase.Discard}
           discardTile={discardTile}
         />
         <div className="underneath">
