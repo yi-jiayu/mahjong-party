@@ -101,7 +101,7 @@ export interface Result {
   winning_tiles: string[];
 }
 
-export interface Round {
+export type Round = {
   draws_left: number;
   scores: number[];
   seat: number;
@@ -114,9 +114,7 @@ export interface Round {
   discards: string[];
   last_action_time: number;
   reserved_duration: number;
-  finished: boolean;
-  result: Result | undefined;
-}
+} & ({ finished: false } | { finished: true; result: Result });
 
 // noinspection NonAsciiCharacters
 const sequences: Record<string, string[][]> = {

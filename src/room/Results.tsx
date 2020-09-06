@@ -43,7 +43,7 @@ const Results: FunctionComponent<{ room: Room }> = ({ room }) => {
       <table>
         <thead>
           <tr>
-            <th/>
+            <th />
             <th>Dealer</th>
             <th>Wind</th>
             <th>Winner</th>
@@ -52,6 +52,24 @@ const Results: FunctionComponent<{ room: Room }> = ({ room }) => {
           </tr>
         </thead>
         <tbody>
+          {room.phase === RoomPhase.InProgress && room.round.finished && (
+            <tr>
+              <td>{results.length + 1}</td>
+              <td>{players[room.round.dealer].name}</td>
+              <td>{WINDS[room.round.wind]}</td>
+              <td>
+                {room.round.result.winner !== -1
+                  ? players[room.round.result.winner].name
+                  : "No one"}
+              </td>
+              <td>
+                {room.round.result.loser !== -1
+                  ? players[room.round.result.loser].name
+                  : "No one"}
+              </td>
+              <td>{room.round.result.points}</td>
+            </tr>
+          )}
           {results
             .slice()
             .reverse()
