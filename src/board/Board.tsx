@@ -113,6 +113,8 @@ const Board: FunctionComponent<{
   } = round;
   const concealed = hands[seat].concealed;
 
+  const [soundOn, setSoundOn] = useState(false);
+
   const [pendingAction, setPendingAction] = useState<ActionType | null>(null);
   const [selected, dispatchSelected] = useReducer(reduceSelected, {
     tiles: [],
@@ -200,7 +202,11 @@ const Board: FunctionComponent<{
     <DndProvider backend={HTML5Backend}>
       <div className="table">
         {children}
-        <Info players={players} round={round}>
+        <Info
+          players={players}
+          round={round}
+          soundOn={soundOn}
+          toggleSound={() => setSoundOn(!soundOn)}>
           {links}
         </Info>
         <Labels players={players} dealer={dealer} seat={seat} scores={scores} />
@@ -228,7 +234,7 @@ const Board: FunctionComponent<{
             discardLastTile={discardLastTile}
             dispatchAction={dispatchAction}
           />
-          <Messages players={players} events={events} />
+          <Messages players={players} events={events} soundOn={soundOn} />
           <Status
             players={players}
             round={round}

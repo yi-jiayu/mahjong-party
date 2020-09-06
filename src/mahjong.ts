@@ -84,7 +84,7 @@ export interface Event {
   type: EventType;
   seat: number;
   time: string;
-  tiles: string[];
+  tiles?: string[];
 }
 
 export enum Direction {
