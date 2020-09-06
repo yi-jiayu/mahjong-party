@@ -42,6 +42,12 @@ const Message: FunctionComponent<{
     case EventType.End:
       message = `Round over. Nobody won.`;
       break;
+    case EventType.Flower:
+      message = `${name} got a flower `;
+      break;
+    case EventType.Bitten:
+      message = `${name} got a bite `;
+      break;
   }
   return (
     <div style={style} className="message">

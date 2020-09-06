@@ -76,6 +76,8 @@ export enum EventType {
   Gang = "gang",
   Hu = "hu",
   End = "end",
+  Flower = "flower",
+  Bitten = "bitten",
 }
 
 export interface Event {
