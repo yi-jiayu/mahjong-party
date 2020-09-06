@@ -1,9 +1,27 @@
 import React, { FunctionComponent } from "react";
-import { Room, RoomPhase } from "../mahjong";
+import { Player, Room, RoomPhase, Result as ResultType } from "../mahjong";
 import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
 
 const WINDS = ["East", "South", "West", "North"];
+
+const Result: React.FC<{
+  players: Player[];
+  result: ResultType;
+  index: number;
+}> = ({ players, result, index }) => {
+  const { dealer, wind, winner, loser, points } = result;
+  return (
+    <tr>
+      <td>{index}</td>
+      <td>{players[dealer].name}</td>
+      <td>{WINDS[wind]}</td>
+      <td>{winner !== -1 ? players[winner].name : "No one"}</td>
+      <td>{loser !== -1 ? players[loser].name : "No one"}</td>
+      <td>{points}</td>
+    </tr>
+  );
+};
 
 const Results: FunctionComponent<{ room: Room }> = ({ room }) => {
   const { id, players, results } = room;
@@ -53,35 +71,22 @@ const Results: FunctionComponent<{ room: Room }> = ({ room }) => {
         </thead>
         <tbody>
           {room.phase === RoomPhase.InProgress && room.round.finished && (
-            <tr>
-              <td>{results.length + 1}</td>
-              <td>{players[room.round.dealer].name}</td>
-              <td>{WINDS[room.round.wind]}</td>
-              <td>
-                {room.round.result.winner !== -1
-                  ? players[room.round.result.winner].name
-                  : "No one"}
-              </td>
-              <td>
-                {room.round.result.loser !== -1
-                  ? players[room.round.result.loser].name
-                  : "No one"}
-              </td>
-              <td>{room.round.result.points}</td>
-            </tr>
+            <Result
+              result={room.round.result}
+              players={room.players}
+              index={results.length + 1}
+            />
           )}
           {results
             .slice()
             .reverse()
-            .map(({ dealer, wind, winner, loser, points }, index) => (
-              <tr key={results.length - index}>
-                <td>{results.length - index}</td>
-                <td>{players[dealer].name}</td>
-                <td>{WINDS[wind]}</td>
-                <td>{winner !== -1 ? players[winner].name : "No one"}</td>
-                <td>{loser !== -1 ? players[loser].name : "No one"}</td>
-                <td>{points}</td>
-              </tr>
+            .map((result, index) => (
+              <Result
+                result={result}
+                players={players}
+                index={results.length - index}
+                key={results.length - index}
+              />
             ))}
         </tbody>
       </table>
