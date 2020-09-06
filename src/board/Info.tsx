@@ -1,15 +1,13 @@
 import React, { FunctionComponent } from "react";
 import { Player, Round } from "../mahjong";
-import { Link, useLocation } from "react-router-dom";
 
 const WINDS = ["East", "South", "West", "North"];
 
 const Info: FunctionComponent<{ players: Player[]; round: Round }> = ({
   players,
   round,
+  children,
 }) => {
-  const location = useLocation();
-
   const { wind, dealer, draws_left } = round;
   return (
     <div className="info">
@@ -17,7 +15,7 @@ const Info: FunctionComponent<{ players: Player[]; round: Round }> = ({
       <span className="infobox">Dealer: {players[dealer].name}</span>
       <span className="infobox">Draws left: {draws_left}</span>
       <span style={{ marginRight: "auto" }} />
-      <Link to={`${location.pathname}/results`}>Results</Link>
+      {children}
     </div>
   );
 };

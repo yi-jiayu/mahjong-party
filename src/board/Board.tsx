@@ -5,7 +5,13 @@ import React, {
   useReducer,
   useState,
 } from "react";
-import { ActionCallback, ActionType, RoundPhase, Player, Round } from "../mahjong";
+import {
+  ActionCallback,
+  ActionType,
+  RoundPhase,
+  Player,
+  Round,
+} from "../mahjong";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
@@ -91,7 +97,8 @@ const Board: FunctionComponent<{
   players: Player[];
   round: Round;
   dispatchAction: ActionCallback;
-}> = ({ nonce, players, round, dispatchAction, children }) => {
+  links?: ReactElement;
+}> = ({ nonce, players, round, dispatchAction, links, children }) => {
   const {
     seat,
     dealer,
@@ -193,7 +200,9 @@ const Board: FunctionComponent<{
     <DndProvider backend={HTML5Backend}>
       <div className="table">
         {children}
-        <Info players={players} round={round} />
+        <Info players={players} round={round}>
+          {links}
+        </Info>
         <Labels players={players} dealer={dealer} seat={seat} scores={scores} />
         <div className="bottom">
           <Tiles tiles={hands[seat].flowers} />

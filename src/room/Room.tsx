@@ -1,5 +1,5 @@
 import React from "react";
-import { Redirect, Route, Switch, useRouteMatch } from "react-router-dom";
+import { Link, Redirect, Route, Switch, useRouteMatch } from "react-router-dom";
 import { ActionType, Room as RoomType, RoomPhase } from "../mahjong";
 import Lobby from "./Lobby";
 import Board from "../board/Board";
@@ -7,7 +7,7 @@ import Results from "./Results";
 import { Helmet } from "react-helmet";
 
 export default function Room({ room }: { room: RoomType }) {
-  const { url } = useRouteMatch();
+  const { path, url } = useRouteMatch();
 
   const dispatch = async (type: ActionType, tiles: string[] = []) => {
     const resp = await fetch(`/api/rooms/${room.id}/actions`, {
@@ -23,7 +23,7 @@ export default function Room({ room }: { room: RoomType }) {
 
   return (
     <Switch>
-      <Route path={`${url}/lobby`}>
+      <Route path={`${path}/lobby`}>
         {room.phase === RoomPhase.InProgress ? (
           <Redirect to={`${url}/`} />
         ) : (
@@ -39,10 +39,10 @@ export default function Room({ room }: { room: RoomType }) {
           </>
         )}
       </Route>
-      <Route path={`${url}/results`}>
+      <Route path={`${path}/results`}>
         <Results room={room} />
       </Route>
-      <Route path={url}>
+      <Route path={path}>
         {room.phase === RoomPhase.InProgress ? (
           <>
             <Helmet>
@@ -53,6 +53,7 @@ export default function Room({ room }: { room: RoomType }) {
               players={room.players}
               round={room.round}
               dispatchAction={dispatch}
+              links={<Link to={`${url}/results`}>Results</Link>}
             />
           </>
         ) : room.phase === RoomPhase.Lobby ? (
