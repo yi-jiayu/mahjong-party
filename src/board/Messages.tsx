@@ -3,15 +3,18 @@ import React, {
   FunctionComponent,
   useEffect,
   useRef,
-  useState,
 } from "react";
 import { Event, EventType, Player } from "../mahjong";
 import Tile from "./Tile";
 import { FixedSizeList } from "react-window";
-import SpeechSynthesisQueue from "./queue";
-import { TILES } from "./speech";
 
-function messageFor(event: Event, players: Player[]) {
+const Message: FunctionComponent<{
+  players: Player[];
+  event: Event;
+  style: CSSProperties;
+}> = ({ players, event, style }) => {
+  const timestamp = new Date(event.time);
+  let tiles = event.tiles || [];
   let name = players[event.seat].name;
   let message: string;
   switch (event.type) {
@@ -46,17 +49,6 @@ function messageFor(event: Event, players: Player[]) {
       message = `${name} got a bite `;
       break;
   }
-  return message;
-}
-
-const Message: FunctionComponent<{
-  players: Player[];
-  event: Event;
-  style: CSSProperties;
-}> = ({ players, event, style }) => {
-  const timestamp = new Date(event.time);
-  let tiles = event.tiles || [];
-  const message = messageFor(event, players);
   return (
     <div style={style} className="message">
       <span style={{ marginRight: "8px" }}>
@@ -72,32 +64,14 @@ const Message: FunctionComponent<{
 const Messages: FunctionComponent<{
   players: Player[];
   events: Event[];
-  soundOn: boolean;
-}> = ({ players, events, soundOn }) => {
+}> = ({ players, events }) => {
   const ref = useRef<FixedSizeList>(null);
-  const queue = useRef(new SpeechSynthesisQueue());
-  const [offset, setOffset] = useState(events.length);
 
   useEffect(() => {
     if (ref.current) {
       ref.current.scrollToItem(events.length - 1);
     }
   });
-
-  useEffect(() => {
-    if (offset < events.length) {
-      if (soundOn) {
-        for (const event of events.slice(offset)) {
-          let message = messageFor(event, players);
-          if (event.tiles) {
-            message += " " + event.tiles.map((tile) => TILES[tile]).join(" ");
-          }
-          queue.current.push(message);
-        }
-      }
-      setOffset(events.length);
-    }
-  }, [offset, events, soundOn, players]);
 
   return (
     <FixedSizeList
