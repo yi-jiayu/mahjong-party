@@ -17,6 +17,7 @@ function HostGame() {
       headers: { "content-type": "application/x-www-form-urlencoded" },
     });
     const roomId = await resp.text();
+    window.ga("send", "event", "room", "create");
     history.replace(`/rooms/${roomId}`);
   };
 
@@ -60,6 +61,7 @@ function JoinGame() {
       headers: { "content-type": "application/x-www-form-urlencoded" },
     });
     if (resp.ok) {
+      window.ga("send", "event", "room", "join");
       history.replace(`/rooms/${room}`);
     } else if (resp.status === 404) {
       alert("Room not found!");

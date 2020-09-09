@@ -48,6 +48,7 @@ export default function Lobby({
       credentials: "include",
     });
     if (resp.ok) {
+      window.ga && window.ga("send", "event", "room", "leave");
       history.push("/");
     }
   };
