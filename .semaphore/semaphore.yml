@@ -28,3 +28,5 @@ blocks:
           value: 'https://e9237c7918ba47c299f383dff65e7857@o220526.ingest.sentry.io/5412038'
         - name: REACT_APP_SENTRY_ENVIRONMENT
           value: production
+        - name: REACT_APP_BASE_URL
+          value: 'https://mahjong.party'
