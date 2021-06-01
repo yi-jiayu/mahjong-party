@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Room as RoomType } from "../mahjong";
 import { useParams } from "react-router-dom";
 import Room from "./Room";
+import * as Sentry from "@sentry/browser";
 
 type ConnectionState =
   | { state: "connecting" }
@@ -21,6 +22,11 @@ const Subscription: React.FC = () => {
     };
     eventSource.onmessage = async (e) => {
       const room = JSON.parse(e.data);
+      Sentry.addBreadcrumb({
+        level: Sentry.Severity.Debug,
+        data: room,
+        message: "Game update",
+      });
       setState({ state: "connected", room: room });
     };
     return () => eventSource.close();
